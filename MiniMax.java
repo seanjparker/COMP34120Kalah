@@ -24,14 +24,24 @@ public class MiniMax {
 		}
 	}
 
-	private Board[] getchildren(Board board, Side side) {
-		ArrayList<Board> children = new ArrayList<StrBoarding>();
-		for (int i = 0; i < board.getNoOfHoles() / 2; i++) {
-			if (board.getSeeds(side, i) > 0) {
-				Move newmove = new Move(side, i);
-				Kalah kalah = new Kalah(board);
-			}
-		}
+	private static ArrayList<Board> getChildren(Board board, Side side) {
+	  ArrayList<Board> children = new ArrayList<Board>();
+	  Board originalBoard = new Board(board);
+
+	  System.out.println(board.getNoOfHoles());
+	  for (int i = 1; i <= board.getNoOfHoles(); i++) {
+	    System.out.println(i);
+	    if (board.getSeeds(side, i) > 0) {
+	      Move newmove = new Move(side, i);
+	      Kalah.makeMove(board,newmove);
+	      children.add(board);
+	      board= new Board(originalBoard);
+
+	    }
+	  }
+	  System.out.println(children);
+	  return children;
+	  }
 	}
 
 	// TODO(whoever): Write a better value function.
