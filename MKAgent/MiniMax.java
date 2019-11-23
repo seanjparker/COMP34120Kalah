@@ -78,9 +78,9 @@ public class MiniMax {
 		final int opponent = !maximizingPlayer ? 1 : 0;
 		int numStonesOurPits = 0;
 		int numStonesOpponentPits = 0;
-		for (int i = 0; i < board[0].length; i++) {
-			numStonesOurPits += board[player][i];
-			numStonesOpponentPits += board[opponent][i];
+		for (int i = 0; i < board.getBoard()[0].length; i++) {
+			numStonesOurPits += board.getBoard()[player][i];
+			numStonesOpponentPits += board.getBoard()[opponent][i];
 		}
 
 		return (board.getBoard[player][0] - board.getBoard[opponent][0]) + (numStonesOurPits - numStonesOpponentPits);
