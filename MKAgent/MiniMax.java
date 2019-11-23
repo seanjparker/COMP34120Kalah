@@ -20,7 +20,7 @@ public class MiniMax {
 			ArrayList<Board> children = getChildren(board,side);
 			for (int i = 0; i < children.size(); i++) {
 				if(children.get(i)!=null){
-					newMax= minimax(children.get(i), side, depth - 1, false);
+					newMax= minimax(children.get(i), side, depth - 1, false).getValue();
 					if(newMax>max){
 						max=newMax;
 						move=i;
@@ -39,7 +39,7 @@ public class MiniMax {
 			int move;
 			for (int i = 0; i < children.size(); i++) {
 				if(children.get(i)!=null){
-					newMin= minimax(children.get(i), side, depth - 1, true);
+					newMin= minimax(children.get(i), side, depth - 1, true).getValue();
 					if(newMin<min){
 						min=newMin;
 						move=i;
@@ -52,7 +52,7 @@ public class MiniMax {
 		}
 	}
 
-	private static ArrayList<Board> getChildren(Board board, Side side) {
+	public static ArrayList<Board> getChildren(Board board, Side side) {
 	  ArrayList<Board> children = new ArrayList<Board>();
 	  Board originalBoard = new Board(board);
 
@@ -72,7 +72,7 @@ public class MiniMax {
 
 
 	// TODO(whoever): Write a better value function.
-	private static double valueFunction(final Board board, final boolean maximizingPlayer) {
+	public static double valueFunction(final Board board, final boolean maximizingPlayer) {
 		final int player = maximizingPlayer ? 0 : 1;
 		final int opponent = !maximizingPlayer ? 1 : 0;
 		int numStonesOurPits = 0;
