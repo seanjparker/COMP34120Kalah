@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 
 public class MiniMax {
-	
+
 	public static ValueObj minimax(Board board, Side side, int depth, boolean maximizingPlayer) {
 		if (depth == 0 || getChildren(board,side) == null) {
 			ValueObj value= new ValueObj();
@@ -20,7 +20,7 @@ public class MiniMax {
 			ArrayList<Board> children = getChildren(board,side);
 			for (int i = 0; i < children.size(); i++) {
 				if(children.get(i)!=null){
-					newMax=Math.max(value.getValue(), minimax(children.get(i), side, depth - 1, false).getValue());
+					newMax= minimax(children.get(i), side, depth - 1, false);
 					if(newMax>max){
 						max=newMax;
 						move=i;
@@ -39,7 +39,7 @@ public class MiniMax {
 			int move;
 			for (int i = 0; i < children.size(); i++) {
 				if(children.get(i)!=null){
-					newMin=Math.min(value.getValue(), minimax(children.get(i), side, depth - 1, true).getValue());
+					newMin= minimax(children.get(i), side, depth - 1, true);
 					if(newMin<min){
 						min=newMin;
 						move=i;
@@ -69,7 +69,7 @@ public class MiniMax {
 	  }
 	  return children;
 	}
-	
+
 
 	// TODO(whoever): Write a better value function.
 	private static double valueFunction(final Board board, final boolean maximizingPlayer) {
