@@ -3,22 +3,48 @@ import java.util.ArrayList;
 import MKAgent.Board;
 
 public class MiniMax {
-	public int minimax(Board board, Side side, int depth, boolean maximizingPlayer) {
+	public ValueObj minimax(Board board, Side side, int depth, boolean maximizingPlayer) {
 		if (depth == 0 || Board.children() == null) {
 			return valueFunction(Board);
 		}
 		if (maximizingPlayer == true) {
-			int value = -1000000000;
+			ValueObj value= new ValueObj();
+			value.setValue(-100000000);
 			Board[] children = board.children();
-			for (int i = 0; i < children.length(); i++) {
-				value = max(value, minimax(children[i], depth - 1, false));
+			int max;
+			int newMax;
+			int move;
+			ArrayList<Board> children = getChildren(board,side);
+			for (int i = 0; i < children.length; i++) {
+				if(children.get(i)!=null){
+					newMax=max(value.getValue, minimax(children.get(i), depth - 1, false));
+					if(newMax>max){
+						max=newMax;
+						move=i;
+					}
+					value.setValue(newMax);
+					value.setMove(move);
+				}
 			}
 			return value;
 		} else {
-			int value = +1000000000;
+			ValueObj value= new ValueObj();
+			value.setValue(100000000);
+			ArrayList<Board> children = getChildren(board,side);
+			int min;
+			int newMin;
+			int move;
 			Board[] children = Board.children();
-			for (int i = 0; i < children.length(); i++) {
-				value = min(value, minimax(children[i], depth - 1, false));
+			for (int i = 0; i < children.length; i++) {
+				if(children.get(i)!=null){
+					newMin=min(value.getValue, minimax(children.get(i), depth - 1, true));
+					if(newMin<min){
+						min=newMin;
+						move=i;
+					}
+					value.setValue(newMin);
+					value.setMove(move);
+				}
 			}
 			return value;
 		}
@@ -37,7 +63,9 @@ public class MiniMax {
 	      children.add(board);
 	      board= new Board(originalBoard);
 
-	    }
+	    }else{
+				children.add(null);
+			}
 	  }
 	  System.out.println(children);
 	  return children;
@@ -55,7 +83,7 @@ public class MiniMax {
 			numStonesOpponentPits += board[opponent][i];
 		}
 
-		return (board.board[player][0] - board.board[opponent][0]) + (numStonesOurPits - numStonesOpponentPits);
+		return (board.getBoard[player][0] - board.getBoard[opponent][0]) + (numStonesOurPits - numStonesOpponentPits);
 	}
 }
 
