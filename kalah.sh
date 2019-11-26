@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Run this command to launch it without compiling the jar
+# java -cp bin MKAgent.Main 
 compile()
 {
   

@@ -22,12 +22,12 @@ public class Main
 		
 		private static void redirectSystemErr() {
 			try {
-					System.setErr(new PrintStream(new FileOutputStream(System.getProperty("user.dir") + "/KalahLog_" + ".log")));
+					System.setErr(new PrintStream(new FileOutputStream(System.getProperty("user.dir") + "/KalahLog" + ".log")));
 			}
 			catch (Exception ex) {
 					System.err.println("Exception " + ex.getMessage());
 			}
-	}
+		}
 
     /**
      * Sends a message to the game engine.
@@ -70,6 +70,7 @@ public class Main
 		redirectSystemErr();
 		try
 		{
+			Side side = Side.SOUTH;
 			String s;
 			int howDeep = 9;
 			while (true)
@@ -80,7 +81,6 @@ public class Main
 				try {
 					MsgType mt = Protocol.getMessageType(s);
 					Protocol.MoveTurn r;
-					Side side = Side.SOUTH;
 					switch (mt)
 					{
 						case START: System.err.println("A start.");
@@ -90,6 +90,8 @@ public class Main
 								Board b = new Board(7,7);
 								ValueObj nextMove = MiniMax.minimax(b, side, howDeep, true);
 								System.out.println("MOVE;"+nextMove.getMove());
+								System.err.println("MOVE;"+nextMove.getMove());
+
 							}else{
 								side = Side.NORTH;
 							}
@@ -107,6 +109,8 @@ public class Main
 								// 	nextMove.setMove(max-min);
 								// }
 								System.out.println("MOVE;"+nextMove.getMove());
+								System.err.println("MOVE;"+nextMove.getMove());
+
 							}
 
 							System.err.println("This was the move: " + r.move);

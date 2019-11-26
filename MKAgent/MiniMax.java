@@ -6,7 +6,6 @@ import java.util.ArrayList;
 public class MiniMax {
 
 	public static ValueObj minimax(Board board, Side side, int depth, boolean maximizingPlayer) {
-
 		if (depth == 0 || getChildren(board,side) == null) {
 			ValueObj value= new ValueObj();
 			value.setValue(valueFunction(board, side, maximizingPlayer));
@@ -24,7 +23,7 @@ public class MiniMax {
 
 				if(children.get(i)!=null){
 
-					newMax= minimax(children.get(i), side, depth - 1, false).getValue();
+					newMax= minimax(children.get(i), side.opposite(), depth - 1, false).getValue();
 					if(newMax>max){
 						max=newMax;
 						move=i;
@@ -47,7 +46,7 @@ public class MiniMax {
 
 				if(children.get(i)!=null){
 
-					newMin= minimax(children.get(i), side, depth - 1, true).getValue();
+					newMin= minimax(children.get(i), side.opposite(), depth - 1, true).getValue();
 					if(newMin<min){
 						min=newMin;
 						move=i;
@@ -66,7 +65,7 @@ public class MiniMax {
 	  Board originalBoard = new Board(board);
     boolean hasChildren=false;
 	  for (int i = 1; i <= originalBoard.getNoOfHoles(); i++) {
-	    if (originalBoard.getSeeds(side, i) > 0) {
+	    if (Kalah.isLegalMove(originalBoard, new Move(side, i))) {
 	      Move newmove = new Move(side, i);
 	      Kalah.makeMove(originalBoard,newmove);
 	      children.add(originalBoard);
