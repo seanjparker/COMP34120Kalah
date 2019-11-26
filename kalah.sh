@@ -2,9 +2,6 @@
 
 compile()
 {
-  if [ -d bin ]; then
-    rm -r bin
-  fi
   
   javac MKAgent/Main.java -d bin
   jar cfm Agent.jar META-INF/MANIFEST.MF -C bin .

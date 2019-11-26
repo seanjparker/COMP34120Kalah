@@ -57,6 +57,7 @@ public class Main
 		try
 		{
 			String s;
+			int howDeep = 9;
 			while (true)
 			{
 				System.err.println();
@@ -64,19 +65,41 @@ public class Main
 				System.err.print("Received: " + s);
 				try {
 					MsgType mt = Protocol.getMessageType(s);
+					Protocol.MoveTurn r;
+					Side side = Side.SOUTH;
 					switch (mt)
 					{
 						case START: System.err.println("A start.");
 							boolean first = Protocol.interpretStartMsg(s);
 							System.err.println("Starting player? " + first);
+							if(first){
+								Board b = new Board(7,7);
+								ValueObj nextMove = MiniMax.minimax(b, side, howDeep, true);
+								System.out.println("MOVE;"+nextMove.getMove());
+							}else{
+								side = Side.NORTH;
+							}
 							break;
 						case STATE: System.err.println("A state.");
-							Board b = new Board(6,6);
-							Protocol.MoveTurn r = Protocol.interpretStateMsg (s, b);
+							// do{
+							Board b = new Board(7,7);
+							r = Protocol.interpretStateMsg (s, b);
+
+							if(!r.end && r.again){
+								ValueObj nextMove = MiniMax.minimax(b, side, howDeep, true);
+								// if(side == Side.NORTH){
+								// 	int max = Math.max(nextMove.getMove(), 8);
+								// 	int min = Math.min(nextMove.getMove(), 8);
+								// 	nextMove.setMove(max-min);
+								// }
+								System.out.println("MOVE;"+nextMove.getMove());
+							}
+
 							System.err.println("This was the move: " + r.move);
 							System.err.println("Is the game over? " + r.end);
 							if (!r.end) System.err.println("Is it our turn again? " + r.again);
-							System.err.print("The board:\n" + b);
+							// System.err.print("The board:\n" + b);
+							// }while(r.again && !r.end);
 							break;
 						case END: System.err.println("An end. Bye bye!"); return;
 					}
