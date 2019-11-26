@@ -2,8 +2,8 @@ package MKAgent;
 public class ValueObj{
   private double value;
   private int move;
-  
-  
+
+
   public double getValue(){
     return value;
   }
@@ -13,7 +13,7 @@ public class ValueObj{
   public void setValue(double value){
     this.value=value;
   }
-  public void setMove(int value){
-    this.value=value;
+  public void setMove(int move){
+    this.move=move;
   }
 }
