@@ -1,8 +1,12 @@
 package MKAgent;
+
 import java.io.BufferedReader;
-import java.io.EOFException;
-import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.EOFException;
 import java.io.Reader;
 
 /**
@@ -14,7 +18,16 @@ public class Main
     /**
      * Input from the game engine.
      */
-    private static Reader input = new BufferedReader(new InputStreamReader(System.in));
+		private static Reader input = new BufferedReader(new InputStreamReader(System.in));
+		
+		private static void redirectSystemErr() {
+			try {
+					System.setErr(new PrintStream(new FileOutputStream(System.getProperty("user.dir") + "/KalahLog_" + ".log")));
+			}
+			catch (Exception ex) {
+					System.err.println("Exception " + ex.getMessage());
+			}
+	}
 
     /**
      * Sends a message to the game engine.
@@ -54,6 +67,7 @@ public class Main
 	 */
 	public static void main(String[] args)
 	{
+		redirectSystemErr();
 		try
 		{
 			String s;
