@@ -9,8 +9,7 @@ public class MiniMax {
 
 		if (depth == 0 || getChildren(board,side) == null) {
 			ValueObj value= new ValueObj();
-		//
-			value.setValue(valueFunction(board, maximizingPlayer));
+			value.setValue(valueFunction(board, side, maximizingPlayer));
 			return value;
 		}
 		if (maximizingPlayer == true) {
@@ -83,18 +82,29 @@ public class MiniMax {
 	}
 
 
-	// TODO(whoever): Write a better value function.
-	public static double valueFunction(final Board board, final boolean maximizingPlayer) {
-		final int player = maximizingPlayer ? 0 : 1;
-		final int opponent = !maximizingPlayer ? 1 : 0;
+	// Value function takes into account the following:
+	// Stones on our side - Stones on their side => H1
+	// Stones in our kalahah - Stones in their kalahah => H2
+	// Number of repeat turns possible from our current position => H3
+	public static double valueFunction(final Board board, final Side side, final boolean maximisingPlayer) {
 		int numStonesOurPits = 0;
 		int numStonesOpponentPits = 0;
-		for (int i = 0; i < board.getBoard()[0].length; i++) {
-			numStonesOurPits += board.getBoard()[player][i];
-			numStonesOpponentPits += board.getBoard()[opponent][i];
+		int extraMove = 0;
+		for (int i = 1; i <= board.getNoOfHoles(); i++) {
+			numStonesOurPits += board.getSeeds(side, i);
+			numStonesOpponentPits += board.getSeeds(side.opposite(), i);
+
+			if (board.getSeeds(side, i) == 8 - i) {
+				extraMove = 1;
+			}
 		}
 
-		return (board.getBoard()[player][0] - board.getBoard()[opponent][0]) + (numStonesOurPits - numStonesOpponentPits);
+		double heuristicTotal = 1.0 * (board.getSeedsInStore(side) - board.getSeedsInStore(side.opposite()))
+			+ 1.25 * (numStonesOurPits - numStonesOpponentPits)
+			+ 4.0 * extraMove;
+
+		heuristicTotal *= maximisingPlayer ? 1.0 : -1.0;
+		return heuristicTotal;
 	}
 }
 
