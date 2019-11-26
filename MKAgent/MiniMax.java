@@ -6,8 +6,10 @@ import java.util.ArrayList;
 public class MiniMax {
 
 	public static ValueObj minimax(Board board, Side side, int depth, boolean maximizingPlayer) {
+
 		if (depth == 0 || getChildren(board,side) == null) {
 			ValueObj value= new ValueObj();
+		//
 			value.setValue(valueFunction(board, maximizingPlayer));
 			return value;
 		}
@@ -18,14 +20,17 @@ public class MiniMax {
 			double newMax;
 			int move = 0;
 			ArrayList<Board> children = getChildren(board,side);
+
 			for (int i = 0; i < children.size(); i++) {
+
 				if(children.get(i)!=null){
+
 					newMax= minimax(children.get(i), side, depth - 1, false).getValue();
 					if(newMax>max){
 						max=newMax;
 						move=i;
 						value.setValue(newMax);
-						value.setMove(move);
+						value.setMove(move+1);
 					}
 				}
 			}
@@ -33,21 +38,26 @@ public class MiniMax {
 		} else {
 			ValueObj value= new ValueObj();
 			value.setValue(100000000);
+
 			ArrayList<Board> children = getChildren(board,side);
+
 			double min = 10000000;
 			double newMin;
 			int move;
 			for (int i = 0; i < children.size(); i++) {
+
 				if(children.get(i)!=null){
+
 					newMin= minimax(children.get(i), side, depth - 1, true).getValue();
 					if(newMin<min){
 						min=newMin;
 						move=i;
 						value.setValue(newMin);
-						value.setMove(move);
+						value.setMove(move +1);
 					}
 				}
 			}
+
 			return value;
 		}
 	}
@@ -55,18 +65,20 @@ public class MiniMax {
 	public static ArrayList<Board> getChildren(Board board, Side side) {
 	  ArrayList<Board> children = new ArrayList<Board>();
 	  Board originalBoard = new Board(board);
-
-	  for (int i = 1; i <= board.getNoOfHoles(); i++) {
-	    if (board.getSeeds(side, i) > 0) {
+    boolean hasChildren=false;
+	  for (int i = 1; i <= originalBoard.getNoOfHoles(); i++) {
+	    if (originalBoard.getSeeds(side, i) > 0) {
 	      Move newmove = new Move(side, i);
-	      Kalah.makeMove(board,newmove);
-	      children.add(board);
-	      board= new Board(originalBoard);
-
+	      Kalah.makeMove(originalBoard,newmove);
+	      children.add(originalBoard);
+	      originalBoard= new Board(board);
+				hasChildren=true;
 	    }else{
 				children.add(null);
 			}
 	  }
+		if(!hasChildren)
+			children=null;
 	  return children;
 	}
 
