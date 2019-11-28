@@ -3,3 +3,6 @@ KalahLog.log
 .vscode
 bin
 /*.jar
+MKAgent/*.class
+results.txt
+/Test.class
