@@ -19,7 +19,7 @@ public class Main
      * Input from the game engine.
      */
 		private static Reader input = new BufferedReader(new InputStreamReader(System.in));
-		
+
 		private static void redirectSystemErr() {
 			try {
 					System.setErr(new PrintStream(new FileOutputStream(System.getProperty("user.dir") + "/KalahLog" + ".log")));
@@ -72,7 +72,7 @@ public class Main
 		{
 			Side side = Side.SOUTH;
 			String s;
-			int howDeep = 9;
+			int howDeep = 12;
 			while (true)
 			{
 				System.err.println();
@@ -88,7 +88,7 @@ public class Main
 							System.err.println("Starting player? " + first);
 							if(first){
 								Board b = new Board(7,7);
-								ValueObj nextMove = MiniMax.minimax(b, side, howDeep, true);
+								ValueObj nextMove = MiniMax.minimax(b, side, howDeep,-100000000,100000000, true);
 								System.out.println("MOVE;"+nextMove.getMove());
 								System.err.println("MOVE;"+nextMove.getMove());
 
@@ -102,7 +102,7 @@ public class Main
 							r = Protocol.interpretStateMsg (s, b);
 
 							if(!r.end && r.again){
-								ValueObj nextMove = MiniMax.minimax(b, side, howDeep, true);
+								ValueObj nextMove = MiniMax.minimax(b, side, howDeep,-1000000000,100000000, true);
 								// if(side == Side.NORTH){
 								// 	int max = Math.max(nextMove.getMove(), 8);
 								// 	int min = Math.min(nextMove.getMove(), 8);
@@ -121,7 +121,7 @@ public class Main
 							break;
 						case END: System.err.println("An end. Bye bye!"); return;
 					}
-					
+
 				} catch (InvalidMessageException e) {
 					System.err.println(e.getMessage());
 				}

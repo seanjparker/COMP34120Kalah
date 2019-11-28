@@ -1,11 +1,11 @@
 package MKAgent;
 import java.util.ArrayList;
-
+import java.lang.Math;
 
 
 public class MiniMax {
 
-	public static ValueObj minimax(Board board, Side side, int depth, boolean maximizingPlayer) {
+	public static ValueObj minimax(Board board, Side side, int depth,double alpha,double beta, boolean maximizingPlayer) {
 		if (depth == 0 || getChildren(board,side) == null) {
 			ValueObj value= new ValueObj();
 			value.setValue(valueFunction(board, side, maximizingPlayer));
@@ -23,7 +23,11 @@ public class MiniMax {
 
 				if(children.get(i)!=null){
 
-					newMax= minimax(children.get(i), side.opposite(), depth - 1, false).getValue();
+					newMax= minimax(children.get(i), side.opposite(), depth - 1,alpha,beta, false).getValue();
+					alpha = Math.max(alpha,value.getValue());
+					if(alpha>=beta){
+						break;
+					}
 					if(newMax>max){
 						max=newMax;
 						move=i;
@@ -31,7 +35,9 @@ public class MiniMax {
 						value.setMove(move+1);
 					}
 				}
+
 			}
+
 			return value;
 		} else {
 			ValueObj value= new ValueObj();
@@ -46,7 +52,11 @@ public class MiniMax {
 
 				if(children.get(i)!=null){
 
-					newMin= minimax(children.get(i), side.opposite(), depth - 1, true).getValue();
+					newMin= minimax(children.get(i), side.opposite(), depth - 1,alpha,beta, true).getValue();
+					beta = Math.min(beta,value.getValue());
+					if(alpha>=beta){
+						break;
+					}
 					if(newMin<min){
 						min=newMin;
 						move=i;
