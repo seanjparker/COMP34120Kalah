@@ -1,19 +1,22 @@
 package MKAgent;
-public class ValueObj{
-  private double value;
+
+public class ValueObj {
+  private int value;
   private int move;
 
-
-  public double getValue(){
+  public int getValue() {
     return value;
   }
-  public int getMove(){
+
+  public int getMove() {
     return move;
   }
-  public void setValue(double value){
-    this.value=value;
+
+  public void setValue(int value) {
+    this.value = value;
   }
-  public void setMove(int move){
-    this.move=move;
+
+  public void setMove(int move) {
+    this.move = move;
   }
 }

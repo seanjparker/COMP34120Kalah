@@ -4,7 +4,12 @@
 # java -cp bin MKAgent.Main 
 compile()
 {
-  
+  if [ -f Agent.jar ]; then
+    rm Agent.jar
+  fi
+  if [ ! -d bin ]; then
+    mkdir bin
+  fi
   javac MKAgent/Main.java -d bin
   jar cfm Agent.jar META-INF/MANIFEST.MF -C bin .
 }
