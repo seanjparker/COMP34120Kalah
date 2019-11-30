@@ -68,7 +68,7 @@ public class Main {
 		try {
 			Side side = Side.SOUTH;
 			String s;
-			int howDeep = 10;
+			int howDeep = 9;
 			while (true) {
 				System.err.println();
 				s = recvMsg();
