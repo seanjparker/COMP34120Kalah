@@ -2,7 +2,8 @@
 
 RESULTS=results.txt
 
-all()
+# Plays as north player.
+north()
 {
     echo "MKREF" >> $RESULTS
     java -jar ManKalah.jar "java -jar MKRefAgent.jar" "java -jar Agent.jar" >> $RESULTS
@@ -10,6 +11,18 @@ all()
     for file in ./Agents/error404.jar; do 
         echo "${file##*/}"  >> $RESULTS
         java -jar ManKalah.jar "java -jar $file" "java -jar Agent.jar" >> $RESULTS
+    done
+}
+
+# Plays all as south player
+south()
+{
+    echo "MKREF" >> $RESULTS
+    java -jar ManKalah.jar "java -jar Agent.jar" "java -jar MKRefAgent.jar" >> $RESULTS
+
+    for file in ./Agents/error404.jar; do 
+        echo "${file##*/}"  >> $RESULTS
+        java -jar ManKalah.jar "java -jar Agent.jar" "java -jar $file" >> $RESULTS
     done
 }
 
@@ -32,7 +45,10 @@ echo "START" > $RESULTS
 
 case "$1" in
     -a|--all)
-        all
+        north
+        ;;
+    -s!--south)
+        south
         ;;
     *)
         some
