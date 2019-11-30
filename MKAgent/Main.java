@@ -95,7 +95,10 @@ public class Main {
 						Board b = new Board(7, 7);
 						r = Protocol.interpretStateMsg(s, b);
 
-						if (!r.end && r.again) {
+						if(r.move == -1){
+							side = side.opposite();
+						}
+						else if (!r.end && r.again) {
 							ValueObj nextMove = Search.search(b, side, howDeep);
 							sendMsg(Protocol.createMoveMsg(nextMove.getMove()));
 							System.err.println("MOVE;" + nextMove.getMove());
