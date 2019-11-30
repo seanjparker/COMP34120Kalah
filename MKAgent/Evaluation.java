@@ -34,7 +34,7 @@ public class Evaluation {
 	* Max score when have >half stones
 	* Check for vunerable stones
 	*/
-  public static int evaluate(final Board board, final Side side, final boolean maximisingPlayer) {
+  public static int evaluate(final Board board, final Side side) {
 		int v1 = scorePitDifference(board, side) * h1;
 		int v2 = seedDifference(board, side) / h2;
 		int v3 = extraMove(board, side) * h3;
@@ -48,8 +48,7 @@ public class Evaluation {
 		// System.err.printf("pit diff = %d, seed diff = %d, extra move = %d, cluster = %d, -cluster = %d, half total = %d, -halftotal = %d, cap = %d, -cap = %d\n\n", v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
 		int value = v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9;
-		// value *= maximisingPlayer ? 1 : -1;
-    return value; 
+    return value;
 	}
 
 	// Heuristic 1
