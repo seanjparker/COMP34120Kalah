@@ -45,7 +45,7 @@ public class Search {
 		List<ValueObj> children = new ArrayList<ValueObj>();
 		for (int i = 1; i <= board.getNoOfHoles(); i++) {
 			if (board.getSeeds(side, i) != 0) {
-				children.add(new ValueObj(i, Evaluation.evaluate(board, side)));
+				children.add(new ValueObj(i, Evaluation.quickEval(board, side)));
 			}
 		}
 		Collections.sort(children);
