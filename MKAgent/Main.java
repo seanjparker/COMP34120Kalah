@@ -103,7 +103,7 @@ public class Main {
 						Board b = new Board(7, 7);
 						r = Protocol.interpretStateMsg(s, b);
 
-						if(r.move == -1){
+						if(r.move == -1) {
 							side = side.opposite();
 						}
 						if (!r.end && r.again) {

@@ -15,14 +15,12 @@ public class Evaluation {
 	private static int h8;
 
 	static {
-		Evaluation.h1 = 5;
-		Evaluation.h2 = 1;
-		Evaluation.h3 = 2;
-		Evaluation.h4 = 1; // Maybe 18?
-		Evaluation.h5 = 2;
-		Evaluation.h6 = 1000;
-		Evaluation.h7 = 5;
-		Evaluation.h8 = 1;
+		Evaluation.h1 = 3;
+		Evaluation.h2 = 2;
+		Evaluation.h3 = 1;
+		Evaluation.h4 = 18;
+		Evaluation.h5 = 1000;
+		Evaluation.h6 = 3;
 	}
 
 	/* 
@@ -34,22 +32,29 @@ public class Evaluation {
 	* Max score when have >half stones
 	* Check for vunerable stones
 	*/
-  public static int evaluate(final Board board, final Side side, final boolean maximisingPlayer) {
-		int v1 = scorePitDifference(board, side) * h1;
-		int v2 = seedDifference(board, side) / h2;
-		int v3 = extraMove(board, side) * h3;
-		int v4 = clusterToScorePit(board, side) / h4;
-		int v5 = -clusterToScorePit(board, side.opposite()) / h5;
-		int v6 = haveHalfStoneTotal(board, side) * h6;
-		int v7 = -haveHalfStoneTotal(board, side.opposite()) * h6;
-		int v8 = -captureStones(board, side) * h7;
-		int v9 = captureStones(board, side.opposite()) / h8;
+  public static int evaluate(final Board board, final Side side) {
+		int v1 = scorePitDifference(board, side) * 5;
+		int v2 = seedDifference(board, side) / 1;
+		int v3 = extraMove(board, side) * 2;
+		int v4 = clusterToScorePit(board, side) / 1;
+		int v5 = -clusterToScorePit(board, side.opposite()) / 2;
+		int v6 = haveHalfStoneTotal(board, side) * 10000;
+		int v7 = -haveHalfStoneTotal(board, side.opposite()) * 10000;
+		int v8 = -captureStones(board, side) * 5;
+		int v9 = captureStones(board, side.opposite()) / 1;
 
 		// System.err.printf("pit diff = %d, seed diff = %d, extra move = %d, cluster = %d, -cluster = %d, half total = %d, -halftotal = %d, cap = %d, -cap = %d\n\n", v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
-		int value = v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9;
-		// value *= maximisingPlayer ? 1 : -1;
-    return value; 
+		return v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9;
+	}
+
+	public static int quickEval(final Board board, final Side side) {
+		int v1 = scorePitDifference(board, side) * 3;
+		int v3 = extraMove(board, side) * 4;
+		int v8 = -captureStones(board, side) * 2;
+		int v6 = haveHalfStoneTotal(board, side) * 10000;
+		int v7 = -haveHalfStoneTotal(board, side.opposite()) * 10000;
+		return v1 + v3 + v6 + v7 + v8;
 	}
 
 	// Heuristic 1
