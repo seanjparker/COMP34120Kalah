@@ -7,8 +7,13 @@ import java.lang.Math;
 
 public class Search {
 
-	public static ValueObj search(Board board, Side side, int depth) {
-		return alphaBeta(board, side, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
+	public static ValueObj search(Board board, Side side, int depth, Terminate t) {
+		ValueObj bestMove = null;
+		for (int i = 1; i <= depth; i++) {
+			bestMove = MTDf(board, side, bestMove, i);
+			if (t.getIsTerminating()) break;
+		}
+		return bestMove;
 	}
 
 	private static ValueObj MTDf(Board board, Side side, ValueObj first, int depth) {
