@@ -5,7 +5,37 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.lang.Math;
 
-public class Search {
+class Search implements Runnable{
+
+	private Thread t;
+	private String threadName;
+	private Board board;
+	private Side side;
+	private ValueObject valueObject;
+	private Terminate isTerminating;
+
+	SearchIDDFS( String name, Board board, Side side, Terminate it, ValueObject vt) {
+		threadName = name;
+		this.board= board;
+		this.side = side;
+		this.valueObject = vt;
+		this.isTerminating = it;
+	}
+
+	public void run() {
+		try {
+			search(board, side, this.valueObject, this.isTerminating);
+		} catch (InterruptedException e) {
+			System.out.println("Thread " +  threadName + " interrupted.");
+		}
+	}
+
+	public void start () {
+		if (t == null) {
+			t = new Thread (this, threadName);
+			t.start ();
+		}
+	}
 
 	public static ValueObj search(Board board, Side side, int depth, Terminate t) {
 		ValueObj bestMove = null;
