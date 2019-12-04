@@ -13,6 +13,7 @@ class Search implements Runnable{
 	private Side side;
 	private ValueObject valueObject;
 	private Terminate isTerminating;
+	private HashMap<Board, ValueObj> transposTable;
 
 	SearchIDDFS( String name, Board board, Side side, Terminate it, ValueObject vt) {
 		threadName = name;
@@ -37,13 +38,18 @@ class Search implements Runnable{
 		}
 	}
 
+	public Search()
+	{
+		transTable = new HashMap<Integer, ValueObj>();
+	}
+
 	public static ValueObj search(Board board, Side side, int depth, Terminate t) {
-		ValueObj bestMove = null;
-		for (int i = 1; i <= depth; i++) {
-			bestMove = MTDf(board, side, bestMove, i);
-			if (t.getIsTerminating()) break;
-		}
-		return bestMove;
+			ValueObj bestMove = null;
+			for (int i = 1; i <= depth; i++) {
+				bestMove = MTDf(board, side, bestMove, i);
+				if (t.getIsTerminating()) break;
+			}
+			return bestMove;
 	}
 
 	private static ValueObj MTDf(Board board, Side side, ValueObj first, int depth) {
@@ -54,7 +60,7 @@ class Search implements Runnable{
 				beta = g.getValue() + 1;
 			else
 				beta = g.getValue();
-			
+
 			g = alphaBetaTT(board, beta - 1, beta, depth);
 
 			if (g.getValue() < beta)
@@ -66,8 +72,7 @@ class Search implements Runnable{
 	}
 
 	private static alphaBetaTT(Board board, int depth, int alpha, int beta) {
-		ValueObj value = new ValueObj();
-		TTEntry tte = getTTEntry(board.hashValue());
+		ValueObj value = getTTValueObj(board);
 		if (tte != null && tte.depth >= depth) {
 			if (tte.type == EXACT) // stored value is exact
 				return tte.move;
@@ -82,11 +87,11 @@ class Search implements Runnable{
 		if (depth == 0 || getSortedChildren(board, side).size() == 0) {
 			value.setValue(Evaluation.evaluate(board, side));
 			if (value.getValue() <= alpha) // a lowerbound value
-				storeTTEntry(board.hashCode(), value, LOWERBOUND, depth);
+				storeValueObjTT(board.hashCode(), value, LOWERBOUND, depth);
 			else if (value.getValue() >= beta)
-				storeTTEntry(board.hashCode(), value, UPPERBOUND, depth);
+				storeValueObjTT(board.hashCode(), value, UPPERBOUND, depth);
 			else
-				storeTTEntry(board.hashCode(), value, EXACT, depth);
+				storeValueObjTT(board.hashCode(), value, EXACT, depth);
 			return value;
 		}
 
@@ -110,14 +115,13 @@ class Search implements Runnable{
 			if (best.getValue() >= beta)
 				break; // Cut off the current branch
 		}
-		
+
 		if (best.getValue() <= alpha) // a lowerbound value
-			storeTTEntry(board.hashCode(), best, LOWERBOUND, depth);
+			storeValueObjTT(board.hashCode(), best, LOWERBOUND, depth);
 		else if (best.getValue() >= beta) // a upperbound value
-			storeTTEntry(board.hashCode(), best, UPPERBOUND, depth);
+			storeValueObjTT(board.hashCode(), best, UPPERBOUND, depth);
 		else	// a true minimax value
-			storeTTEntry(board.hashCode(), best, EXACT, depth);
-		
+			storeValueObjTT(board.hashCode(), best, EXACT, depth);
 		return best;
 	}
 
@@ -161,6 +165,16 @@ class Search implements Runnable{
 		Collections.sort(children);
 		return children;
 	}
+}
+
+public ValueObj getTTValueObj(Board board)
+{
+	return transTable.get(board);
+}
+
+public void storeValueObjTT(Board board, int value, int type, int depth)
+{
+	transTable.put(board, new ValueObj(/*move,*/ value, type, depth))
 }
 
 // The assumptions are:

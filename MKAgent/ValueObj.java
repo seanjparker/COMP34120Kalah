@@ -3,8 +3,17 @@ package MKAgent;
 public class ValueObj implements Comparable<Object> {
   private int value;
   private int move;
+  private int type;
+  private int depth;
 
   public ValueObj() {
+  }
+
+  public ValueObj(int move, int value, int type, int depth) {
+    this.move = move;
+    this.value = value;
+    this.type = type;
+    this.depth = depth;
   }
 
   public ValueObj(int move, int value) {

@@ -286,4 +286,10 @@ public class Board extends Observable implements Cloneable
 	public int[][] getBoard(){
 		return board;
 	}
+
+	@Override
+	public int hashCode()
+	{
+		return -1;
+	}
 }
