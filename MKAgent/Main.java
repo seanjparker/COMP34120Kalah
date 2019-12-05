@@ -91,7 +91,7 @@ public class Main {
 						System.err.println("Starting player? " + first);
 						if (first) {
 							Board b = new Board(7, 7);
-							ValueObj nextMove = search.search(b, side, howDeep);
+							ValueObj nextMove = search.search(b, side, howDeep, new Terminate());
 							sendMsg(Protocol.createMoveMsg(nextMove.getMove()));
 							System.err.println("MOVE;" + nextMove.getMove());
 						} else {
@@ -107,7 +107,7 @@ public class Main {
 							side = side.opposite();
 						}
 						if (!r.end && r.again) {
-							ValueObj nextMove = search.search(b, side, howDeep);
+							ValueObj nextMove = search.search(b, side, howDeep, new Terminate());
 							sendMsg(Protocol.createMoveMsg(nextMove.getMove()));
 							System.err.println("MOVE;" + nextMove.getMove());
 						}

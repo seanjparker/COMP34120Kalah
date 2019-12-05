@@ -2,6 +2,7 @@ package MKAgent;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Collections;
 import java.lang.Math;
 
@@ -11,9 +12,9 @@ class Search implements Runnable{
 	private String threadName;
 	private Board board;
 	private Side side;
-	private ValueObject valueObject;
+	private ValueObj valueObject;
 	private Terminate isTerminating;
-	private HashMap<Board, ValueObj> transposTable;
+	private static HashMap<Board, ValueObj> transposTable;
 
 	SearchIDDFS( String name, Board board, Side side, Terminate it, ValueObject vt) {
 		threadName = name;
@@ -40,7 +41,7 @@ class Search implements Runnable{
 
 	public Search()
 	{
-		transTable = new HashMap<Integer, ValueObj>();
+		transposTable = new HashMap<Board, ValueObj>();
 	}
 
 	public static ValueObj search(Board board, Side side, int depth, Terminate t) {
@@ -61,7 +62,7 @@ class Search implements Runnable{
 			else
 				beta = g.getValue();
 
-			g = alphaBetaTT(board, beta - 1, beta, depth);
+			g = alphaBetaTT(board, side, beta - 1, beta, depth);
 
 			if (g.getValue() < beta)
 				upperbound = g.getValue();
@@ -71,27 +72,27 @@ class Search implements Runnable{
 		return g;
 	}
 
-	private static alphaBetaTT(Board board, int depth, int alpha, int beta) {
+	private static ValueObj alphaBetaTT(Board board, Side side, int depth, int alpha, int beta) {
 		ValueObj value = getTTValueObj(board);
-		if (tte != null && tte.depth >= depth) {
-			if (tte.type == EXACT) // stored value is exact
-				return tte.move;
-			if (tte.type == LOWERBOUND && tte.value > alpha)
-				alpha = tte.value; // update lowerbound alpha if needed
-			else if (tte.type == UPPERBOUND && tte.value < beta)
-				beta = tte.value; // update upperbound beta if needed
+		if (value != null && value.getDepth() >= depth) {
+			if (value.getType() == 0) // stored value is exact
+				return value;
+			if (value.getType() == -1 && value.getValue() > alpha)
+				alpha = value.getValue(); // update lowerbound alpha if needed
+			else if (value.getType() == 1 && value.getValue() < beta)
+				beta = value.getValue(); // update upperbound beta if needed
 			if (alpha >= beta)
-				return tte.move; // if lowerbound surpasses upperbound
+				return value; // if lowerbound surpasses upperbound
 		}
 
 		if (depth == 0 || getSortedChildren(board, side).size() == 0) {
 			value.setValue(Evaluation.evaluate(board, side));
 			if (value.getValue() <= alpha) // a lowerbound value
-				storeValueObjTT(board.hashCode(), value, LOWERBOUND, depth);
+				storeValueObjTT(board, value, -1, depth);
 			else if (value.getValue() >= beta)
-				storeValueObjTT(board.hashCode(), value, UPPERBOUND, depth);
+				storeValueObjTT(board, value, 1, depth);
 			else
-				storeValueObjTT(board.hashCode(), value, EXACT, depth);
+				storeValueObjTT(board, value, 0, depth);
 			return value;
 		}
 
@@ -117,11 +118,11 @@ class Search implements Runnable{
 		}
 
 		if (best.getValue() <= alpha) // a lowerbound value
-			storeValueObjTT(board.hashCode(), best, LOWERBOUND, depth);
+			storeValueObjTT(board, best, -1, depth);
 		else if (best.getValue() >= beta) // a upperbound value
-			storeValueObjTT(board.hashCode(), best, UPPERBOUND, depth);
+			storeValueObjTT(board, best, 1, depth);
 		else	// a true minimax value
-			storeValueObjTT(board.hashCode(), best, EXACT, depth);
+			storeValueObjTT(board, best, 0, depth);
 		return best;
 	}
 
@@ -165,17 +166,18 @@ class Search implements Runnable{
 		Collections.sort(children);
 		return children;
 	}
+
+	public static ValueObj getTTValueObj(Board board)
+	{
+		return transposTable.get(board);
+	}
+
+	public static void storeValueObjTT(Board board, ValueObj value, int type, int depth)
+	{
+		transposTable.put(board, new ValueObj(value.getMove(), value.getValue(), type, depth))
+	}
 }
 
-public ValueObj getTTValueObj(Board board)
-{
-	return transTable.get(board);
-}
-
-public void storeValueObjTT(Board board, int value, int type, int depth)
-{
-	transTable.put(board, new ValueObj(/*move,*/ value, type, depth))
-}
 
 // The assumptions are:
 // We have the 'Board' passed in from the API.

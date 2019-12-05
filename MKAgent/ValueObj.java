@@ -29,12 +29,28 @@ public class ValueObj implements Comparable<Object> {
     return move;
   }
 
+  public int getType() {
+    return type;
+  }
+
+  public int getDepth() {
+    return depth;
+  }
+
   public void setValue(int value) {
     this.value = value;
   }
 
   public void setMove(int move) {
     this.move = move;
+  }
+
+  public void setType(int type) {
+    this.type = type;
+  }
+
+  public void setDepth(int depth) {
+    this.depth = depth;
   }
 
   public ValueObj clone() {

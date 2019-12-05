@@ -287,9 +287,82 @@ public class Board extends Observable implements Cloneable
 		return board;
 	}
 
+	/**
+	* A Java implementation of hashword from lookup3.c by Bob Jenkins
+	* (<a href="http://burtleburtle.net/bob/c/lookup3.c">original source</a>).
+	*
+	* @param k   the key to hash
+	* @param offset   offset of the start of the key
+	* @param length   length of the key
+	* @param initval  initial value to fold into the hash
+	* @return  the 32 bit hash code
+	*/
+	private int lookup3(int[] k, int offset, int length, int initval)
+	{
+
+		    int a,b,c;
+		    a = b = c = 0xdeadbeef + (length<<2) + initval;
+
+		    int i=offset;
+		    while (length > 3)
+		    {
+		      a += k[i];
+		      b += k[i+1];
+		      c += k[i+2];
+
+		      // mix(a,b,c)... Java needs "out" parameters!!!
+		      // Note: recent JVMs (Sun JDK6) turn pairs of shifts (needed to do a rotate)
+		      // into real x86 rotate instructions.
+		      {
+		        a -= c;  a ^= (c<<4)|(c>>>-4);   c += b;
+		        b -= a;  b ^= (a<<6)|(a>>>-6);   a += c;
+		        c -= b;  c ^= (b<<8)|(b>>>-8);   b += a;
+		        a -= c;  a ^= (c<<16)|(c>>>-16); c += b;
+		        b -= a;  b ^= (a<<19)|(a>>>-19); a += c;
+		        c -= b;  c ^= (b<<4)|(b>>>-4);   b += a;
+		      }
+
+		      length -= 3;
+		      i += 3;
+		    }
+
+		    switch(length) {
+		      case 3 : c+=k[i+2];  // fall through
+		      case 2 : b+=k[i+1];  // fall through
+		      case 1 : a+=k[i+0];  // fall through
+		        // final(a,b,c);
+		      {
+		        c ^= b; c -= (b<<14)|(b>>>-14);
+		        a ^= c; a -= (c<<11)|(c>>>-11);
+		        b ^= a; b -= (a<<25)|(a>>>-25);
+		        c ^= b; c -= (b<<16)|(b>>>-16);
+		        a ^= c; a -= (c<<4)|(c>>>-4);
+		        b ^= a; b -= (a<<14)|(a>>>-14);
+		        c ^= b; c -= (b<<24)|(b>>>-24);
+		      }
+		      case 0:
+		        break;
+		    }
+		    return c;
+	}
+
 	@Override
 	public int hashCode()
 	{
-		return -1;
+		int[] key = new int[14];
+		int keyIndex = 0;
+		for(int i = 0; i < board.length; i++)
+		{
+			for(int j = 0; i < board[i].length; j++)
+			{
+				if(j != 0)
+				{
+					key[keyIndex] = board[i][j];
+					keyCounter++;
+				}
+			}
+		}
+
+		return lookup3(key, 0, 14, 0);
 	}
 }
