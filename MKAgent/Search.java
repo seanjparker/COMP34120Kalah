@@ -11,11 +11,11 @@ class Search implements Runnable{
 	private String threadName;
 	private Board board;
 	private Side side;
-	private ValueObject valueObject;
+	private ValueObj valueObject;
 	private Terminate isTerminating;
 
-	SearchIDDFS( String name, Board board, Side side, Terminate it, ValueObject vt) {
-		threadName = name;
+	Search( String name, Board board, Side side, Terminate it, ValueObj vt) {
+		this.threadName = name;
 		this.board= board;
 		this.side = side;
 		this.valueObject = vt;
@@ -37,16 +37,16 @@ class Search implements Runnable{
 		}
 	}
 
-	public static ValueObj search(Board board, Side side, int depth, Terminate t) {
-		ValueObj bestMove = null;
-		for (int i = 1; i <= depth; i++) {
-			bestMove = MTDf(board, side, bestMove, i);
+	public void search(Board board, Side side, ValueObj vt, Terminate t) {
+		// ValueObj bestMove = null;
+		for (int i = 1; i <= 20; i++) {
+			vt = MTDf(board, side, vt, i);
 			if (t.getIsTerminating()) break;
 		}
-		return bestMove;
+		// return bestMove;
 	}
 
-	private static ValueObj MTDf(Board board, Side side, ValueObj first, int depth) {
+	private ValueObj MTDf(Board board, Side side, ValueObj first, int depth) {
 		ValueObj g = first;
 		int beta, upperbound = Integer.MAX_VALUE, lowerbound = Integer.MIN_VALUE;
 		do {
@@ -65,7 +65,7 @@ class Search implements Runnable{
 		return g;
 	}
 
-	private static alphaBetaTT(Board board, int depth, int alpha, int beta) {
+	private alphaBetaTT(Board board, int depth, int alpha, int beta) {
 		ValueObj value = new ValueObj();
 		TTEntry tte = getTTEntry(board.hashValue());
 		if (tte != null && tte.depth >= depth) {
@@ -121,7 +121,7 @@ class Search implements Runnable{
 		return best;
 	}
 
-	private static ValueObj alphaBeta(Board board, Side side, int depth, double alpha, double beta) {
+	private ValueObj alphaBeta(Board board, Side side, int depth, double alpha, double beta) {
 		ValueObj value = new ValueObj();
 		if (depth == 0 || getSortedChildren(board, side).size() == 0) {
 			value.setValue(Evaluation.evaluate(board, side));
@@ -151,7 +151,7 @@ class Search implements Runnable{
 		return best;
 	}
 
-	public static List<ValueObj> getSortedChildren(Board board, Side side) {
+	public List<ValueObj> getSortedChildren(Board board, Side side) {
 		List<ValueObj> children = new ArrayList<ValueObj>();
 		for (int i = 1; i <= board.getNoOfHoles(); i++) {
 			if (board.getSeeds(side, i) != 0) {

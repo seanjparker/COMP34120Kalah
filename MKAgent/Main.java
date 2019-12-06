@@ -44,14 +44,10 @@ public class Main {
 	 * @return The message.
 	 * @throws IOException if there has been an I/O error.
 	 */
-	public static String recvMsg(Board board, Side side) throws IOException {
+	public static String recvMsg(Search R1) throws IOException {
 		StringBuilder message = new StringBuilder();
 		int newCharacter;
 
-		ValueTree valueTree = new ValueTree(0, null);
-		Terminate t = new Terminate();
-
-		SearchIDDFS R1 = new SearchIDDFS( "Thread-1", board, side, t, valueTree);
       	R1.start();
 		
 		  do {
@@ -62,6 +58,7 @@ public class Main {
 		} while ((char) newCharacter != '\n');
 
 		t.setIsTerminating(true);
+		R1.join();
 		return message.toString();
 	}
 
@@ -76,10 +73,14 @@ public class Main {
 			Side side = Side.SOUTH;
 			String s;
 			Board board = new Board(7, 7);
+			ValueObj nextMove = new ValueObj();
+			Terminate t = new Terminate();
 			int howDeep = 9;
 			while (true) {
 				System.err.println();
-				s = recvMsg(board, side);
+				t.setIsTerminating(false);
+				Search R1 = new Search( "Thread-1", board, side, t, nextMove);
+				s = recvMsg(R1);
 				System.err.print("Received: " + s);
 				try {
 					MsgType mt = Protocol.getMessageType(s);
@@ -91,7 +92,16 @@ public class Main {
 						System.err.println("Starting player? " + first);
 						if (first) {
 							Board b = new Board(7, 7);
-							ValueObj nextMove = Search.search(b, side, howDeep);
+
+							Search R2 = new Search( "Thread-1", board, side, t, nextMove);
+							t.setIsTerminating(false);
+							R2.start();
+
+							TimeUnit.SECONDS.sleep(1);
+
+							t.setIsTerminating(true);
+							R2.join();
+
 							sendMsg(Protocol.createMoveMsg(nextMove.getMove()));
 							System.err.println("MOVE;" + nextMove.getMove());
 						} else {
@@ -103,14 +113,23 @@ public class Main {
 						Board b = new Board(7, 7);
 						r = Protocol.interpretStateMsg(s, b);
 
+						board = b;
+
 						if(r.move == -1) {
 							side = side.opposite();
 						}
 						if (!r.end && r.again) {
-							ValueObj nextMove = Search.search(b, side, howDeep);
+							SearchIDDFS R2 = new Search( "Thread-1", board, side, t, nextMove);
+							t.setIsTerminating(false);
+							R2.start();
+
+							TimeUnit.SECONDS.sleep(1);
+
+							t.setIsTerminating(true);
+							R2.join();
+
 							sendMsg(Protocol.createMoveMsg(nextMove.getMove()));
 							System.err.println("MOVE;" + nextMove.getMove());
-							Kalah.makeMove(board, new Move(side, nextMove.getMove()));
 						}
 						
 						System.err.println("This was the move: " + r.move);
