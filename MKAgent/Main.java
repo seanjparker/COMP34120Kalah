@@ -72,14 +72,14 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		redirectSystemErr();
-		Search search = new Search();
 		try {
+			Terminate t = new Terminate();
 			Side side = Side.SOUTH;
 			String s;
 			int howDeep = 9;
 			while (true) {
 				System.err.println();
-				s = recvMsg();
+				s = recvMsg(board, side);
 				System.err.print("Received: " + s);
 				try {
 					MsgType mt = Protocol.getMessageType(s);
@@ -91,7 +91,7 @@ public class Main {
 						System.err.println("Starting player? " + first);
 						if (first) {
 							Board b = new Board(7, 7);
-							ValueObj nextMove = search.search(b, side, howDeep, new Terminate());
+							ValueObj nextMove = Search.search(b, side, howDeep, new Terminate());
 							sendMsg(Protocol.createMoveMsg(nextMove.getMove()));
 							System.err.println("MOVE;" + nextMove.getMove());
 						} else {
@@ -107,7 +107,7 @@ public class Main {
 							side = side.opposite();
 						}
 						if (!r.end && r.again) {
-							ValueObj nextMove = search.search(b, side, howDeep, new Terminate());
+							ValueObj nextMove = Search.search(b, side, howDeep, new Terminate());
 							sendMsg(Protocol.createMoveMsg(nextMove.getMove()));
 							System.err.println("MOVE;" + nextMove.getMove());
 						}

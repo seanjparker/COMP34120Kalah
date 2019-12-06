@@ -16,18 +16,18 @@ class Search implements Runnable{
 	private Terminate isTerminating;
 	private static HashMap<Board, ValueObj> transposTable;
 
-	SearchIDDFS( String name, Board board, Side side, Terminate it, ValueObject vt) {
-		threadName = name;
+	Search(String name, Board board, Side side, Terminate it, ValueObj vt) {
+		this.threadName = name;
 		this.board= board;
 		this.side = side;
-		this.valueObject = vt;
 		this.isTerminating = it;
+		this.valueObject = vt;
 	}
 
 	public void run() {
 		try {
-			search(board, side, this.valueObject, this.isTerminating);
-		} catch (InterruptedException e) {
+			search(board, side, 7, this.isTerminating);
+		} catch (Exception e) {
 			System.out.println("Thread " +  threadName + " interrupted.");
 		}
 	}
@@ -126,7 +126,7 @@ class Search implements Runnable{
 		return best;
 	}
 
-	private static ValueObj alphaBeta(Board board, Side side, int depth, double alpha, double beta) {
+	/* private static ValueObj alphaBeta(Board board, Side side, int depth, double alpha, double beta) {
 		ValueObj value = new ValueObj();
 		if (depth == 0 || getSortedChildren(board, side).size() == 0) {
 			value.setValue(Evaluation.evaluate(board, side));
@@ -154,7 +154,7 @@ class Search implements Runnable{
 		}
 
 		return best;
-	}
+	} */
 
 	public static List<ValueObj> getSortedChildren(Board board, Side side) {
 		List<ValueObj> children = new ArrayList<ValueObj>();
@@ -174,7 +174,7 @@ class Search implements Runnable{
 
 	public static void storeValueObjTT(Board board, ValueObj value, int type, int depth)
 	{
-		transposTable.put(board, new ValueObj(value.getMove(), value.getValue(), type, depth))
+		transposTable.put(board, new ValueObj(value.getMove(), value.getValue(), type, depth));
 	}
 }
 

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.lang.Math;
+import java.lang.InterruptedException;
 
 class SearchIDDFS implements Runnable{
 
@@ -15,7 +16,7 @@ class SearchIDDFS implements Runnable{
 	private Terminate isTerminating;
 
 	SearchIDDFS( String name, Board board, Side side, Terminate it, ValueTree vt) {
-		threadName = name;
+		this.threadName = name;
 		this.board= board;
 		this.side = side;
 		this.valueTree = vt;
@@ -43,29 +44,29 @@ class SearchIDDFS implements Runnable{
 
 	private static void alphaBeta(Board board, Side side, double alpha, double beta, boolean maximizingPlayer, ValueTree valueTree, Terminate it) throws InterruptedException{
 		
-		if (it.getIsTerminating() != true && getSortedChildren(board, side, maximizingPlayer).size() != 0) {
-			ValueObj value = new ValueObj();
-			List<ValueObj> children = getSortedChildren(board, side, maximizingPlayer);
+		// if (it.getIsTerminating() != true && getSortedChildren(board, side, maximizingPlayer).size() != 0) {
+		// 	ValueObj value = new ValueObj();
+		// 	List<ValueObj> children = getSortedChildren(board, side, maximizingPlayer);
 
-			valueTree.setChildren(children.size());
+		// 	valueTree.setChildren(children.size());
 
-			for (int i = 0; i < children.size(); i++) {
-				children.get(i).setValue(-children.get(i).getValue());
-				valueTree.updateValue(children.get(i));
-				valueTree.getChildren(i).updateValue(children.get(i));
+		// 	for (int i = 0; i < children.size(); i++) {
+		// 		children.get(i).setValue(-children.get(i).getValue());
+		// 		valueTree.updateValue(children.get(i));
+		// 		valueTree.getChildren(i).updateValue(children.get(i));
 
-				Board nextBoard = new Board(board);
-				Kalah.makeMove(nextBoard, new Move(side, children.get(i).getMove()));
-				alphaBeta(nextBoard, side.opposite(), -beta, -alpha, !maximizingPlayer, valueTree.getChildren(i), it);
-			}
-		}
+		// 		Board nextBoard = new Board(board);
+		// 		Kalah.makeMove(nextBoard, new Move(side, children.get(i).getMove()));
+		// 		alphaBeta(nextBoard, side.opposite(), -beta, -alpha, !maximizingPlayer, valueTree.getChildren(i), it);
+		// 	}
+		// }
 	}
 
 	public static List<ValueObj> getSortedChildren(Board board, Side side, boolean maximizingPlayer) {
 		List<ValueObj> children = new ArrayList<ValueObj>();
 		for (int i = 1; i <= board.getNoOfHoles(); i++) {
 			if (board.getSeeds(side, i) != 0) {
-				children.add(new ValueObj(i, Evaluation.evaluate(board, side, maximizingPlayer)));
+				//children.add(new ValueObj(i, Evaluation.evaluate(board, side, maximizingPlayer)));
 			}
 		}
 		Collections.sort(children);
