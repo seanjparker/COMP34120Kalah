@@ -353,13 +353,9 @@ public class Board extends Observable implements Cloneable
 		int keyIndex = 0;
 		for(int i = 0; i < board.length; i++)
 		{
-			for(int j = 0; i < board[i].length; j++)
+			for(int j = 1; j <= holes; j++)
 			{
-				if(j != 0)
-				{
-					key[keyIndex] = board[i][j];
-					keyCounter++;
-				}
+				key[keyIndex++] = board[i][j];
 			}
 		}
 

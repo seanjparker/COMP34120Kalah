@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Collections;
 import java.lang.Math;
 
-class Search implements Runnable{
+class Search implements Runnable {
 
 	private Thread t;
 	private String threadName;
@@ -14,9 +14,9 @@ class Search implements Runnable{
 	private Side side;
 	private ValueObj valueObject;
 	private Terminate isTerminating;
-	private static HashMap<Board, ValueObj> transposTable;
 
-	Search( String name, Board board, Side side, Terminate it, ValueObj vt) {
+
+	Search(String name, Board board, Side side, Terminate it, ValueObj vt) {
 		this.threadName = name;
 		this.board= board;
 		this.side = side;
@@ -26,7 +26,7 @@ class Search implements Runnable{
 
 	public void run() {
 		try {
-			search(board, side, 7, this.isTerminating);
+			search(board, side, this.vt, this.isTerminating);
 		} catch (Exception e) {
 			System.out.println("Thread " +  threadName + " interrupted.");
 		}
@@ -67,14 +67,15 @@ class Search implements Runnable{
 		return g;
 	}
 
-	private static ValueObj alphaBetaTT(Board board, Side side, int depth, int alpha, int beta) {
-		ValueObj value = getTTValueObj(board);
+	private ValueObj alphaBetaTT(Board board, Side side, int depth, int alpha, int beta) {
+		ValueObj value = TranspositionTable.get(board);
+		if (value == null) value = new ValueObj();
 		if (value != null && value.getDepth() >= depth) {
-			if (value.getType() == 0) // stored value is exact
+			if (value.getType() == TTType.EXACT) // stored value is exact
 				return value;
-			if (value.getType() == -1 && value.getValue() > alpha)
+			if (value.getType() == TTType.LOWERBOUND && value.getValue() > alpha)
 				alpha = value.getValue(); // update lowerbound alpha if needed
-			else if (value.getType() == 1 && value.getValue() < beta)
+			else if (value.getType() == TTType.UPPERBOUND && value.getValue() < beta)
 				beta = value.getValue(); // update upperbound beta if needed
 			if (alpha >= beta)
 				return value; // if lowerbound surpasses upperbound
@@ -83,11 +84,11 @@ class Search implements Runnable{
 		if (depth == 0 || getSortedChildren(board, side).size() == 0) {
 			value.setValue(Evaluation.evaluate(board, side));
 			if (value.getValue() <= alpha) // a lowerbound value
-				storeValueObjTT(board, value, -1, depth);
+				TranspositionTable.put(board, value, TTType.LOWERBOUND, depth);
 			else if (value.getValue() >= beta)
-				storeValueObjTT(board, value, 1, depth);
+				TranspositionTable.put(board, value, TTType.UPPERBOUND, depth);
 			else
-				storeValueObjTT(board, value, 0, depth);
+				TranspositionTable.put(board, value, TTType.EXACT, depth);
 			return value;
 		}
 
@@ -113,43 +114,13 @@ class Search implements Runnable{
 		}
 
 		if (best.getValue() <= alpha) // a lowerbound value
-			storeValueObjTT(board, best, -1, depth);
+			TranspositionTable.put(board, best, TTType.LOWERBOUND, depth);
 		else if (best.getValue() >= beta) // a upperbound value
-			storeValueObjTT(board, best, 1, depth);
+			TranspositionTable.put(board, best, TTType.UPPERBOUND, depth);
 		else	// a true minimax value
-			storeValueObjTT(board, best, 0, depth);
+			TranspositionTable.put(board, best, TTType.EXACT, depth);
 		return best;
 	}
-
-	/* private static ValueObj alphaBeta(Board board, Side side, int depth, double alpha, double beta) {
-		ValueObj value = new ValueObj();
-		if (depth == 0 || getSortedChildren(board, side).size() == 0) {
-			value.setValue(Evaluation.evaluate(board, side));
-			return value;
-		}
-		List<ValueObj> children = getSortedChildren(board, side);
-		ValueObj best = new ValueObj();
-		best.setValue(Integer.MIN_VALUE);
-
-		for (int i = 0; i < children.size(); i++) {
-			Board nextBoard = new Board(board);
-			Kalah.makeMove(nextBoard, new Move(side, children.get(i).getMove()));
-			value = alphaBeta(nextBoard, side.opposite(), depth - 1, -beta, -alpha);
-			value.setValue(-value.getValue());
-
-			// Value is a better move than best
-			if (value.compareTo(best) > 0) {
-				value.setMove(children.get(i).getMove());
-				best = value.clone();
-			}
-			if (best.getValue() > alpha)
-				alpha = best.getValue();
-			if (alpha >= beta)
-				break; // Cut off the current branch
-		}
-
-		return best;
-	} */
 
 	public List<ValueObj> getSortedChildren(Board board, Side side) {
 		List<ValueObj> children = new ArrayList<ValueObj>();
@@ -162,14 +133,8 @@ class Search implements Runnable{
 		return children;
 	}
 
-	public static ValueObj getTTValueObj(Board board)
-	{
-		return transposTable.get(board);
-	}
-
-	public static void storeValueObjTT(Board board, ValueObj value, int type, int depth)
-	{
-		transposTable.put(board, new ValueObj(value.getMove(), value.getValue(), type, depth));
+	public getBestMove() {
+		return this.valueObject;
 	}
 }
 

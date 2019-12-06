@@ -3,13 +3,13 @@ package MKAgent;
 public class ValueObj implements Comparable<Object> {
   private int value;
   private int move;
-  private int type;
+  private TTType type;
   private int depth;
 
   public ValueObj() {
   }
 
-  public ValueObj(int move, int value, int type, int depth) {
+  public ValueObj(int move, int value, TTType type, int depth) {
     this.move = move;
     this.value = value;
     this.type = type;
@@ -29,7 +29,7 @@ public class ValueObj implements Comparable<Object> {
     return move;
   }
 
-  public int getType() {
+  public TTType getType() {
     return type;
   }
 
@@ -45,7 +45,7 @@ public class ValueObj implements Comparable<Object> {
     this.move = move;
   }
 
-  public void setType(int type) {
+  public void setType(TTType type) {
     this.type = type;
   }
 
@@ -60,5 +60,9 @@ public class ValueObj implements Comparable<Object> {
   public int compareTo(Object o) {
     ValueObj other = (ValueObj) o;
     return this.value == other.getValue() ? 0 : this.value > other.getValue() ? 1 : -1;
+  }
+
+  public String toString() {
+    return "Value = " + value + ", move = " + move + ", depth = " + type;
   }
 }

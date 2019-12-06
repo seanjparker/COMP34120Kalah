@@ -48,7 +48,7 @@ public class Main {
 		StringBuilder message = new StringBuilder();
 		int newCharacter;
 
-      	R1.start();
+		R1.start();
 		
 		do {
 			newCharacter = input.read();
@@ -112,13 +112,13 @@ public class Main {
 						Board b = new Board(7, 7);
 						r = Protocol.interpretStateMsg(s, b);
 
-						board = b;
+						board = b.clone();
 
 						if(r.move == -1) {
 							side = side.opposite();
 						}
 						if (!r.end && r.again) {
-							SearchIDDFS R2 = new Search( "Thread-1", board, side, t, nextMove);
+							Search R2 = new Search("Thread-1", board, side, t, nextMove);
 							t.setIsTerminating(false);
 							R2.start();
 
