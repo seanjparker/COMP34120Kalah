@@ -29,7 +29,7 @@ public class Main {
 
 	/**
 	 * Sends a message to the game engine.
-	 * 
+	 *
 	 * @param msg The message.
 	 */
 	public static void sendMsg(String msg) {
@@ -40,7 +40,7 @@ public class Main {
 	/**
 	 * Receives a message from the game engine. Messages are terminated by a '\n'
 	 * character.
-	 * 
+	 *
 	 * @return The message.
 	 * @throws IOException if there has been an I/O error.
 	 */
@@ -50,7 +50,7 @@ public class Main {
 
       	R1.start();
 		
-		  do {
+		do {
 			newCharacter = input.read();
 			if (newCharacter == -1)
 				throw new EOFException("Input ended unexpectedly.");
@@ -64,17 +64,17 @@ public class Main {
 
 	/**
 	 * The main method, invoked when the program is started.
-	 * 
+	 *
 	 * @param args Command line arguments.
 	 */
 	public static void main(String[] args) {
 		redirectSystemErr();
 		try {
+			Terminate t = new Terminate();
 			Side side = Side.SOUTH;
 			String s;
 			Board board = new Board(7, 7);
 			ValueObj nextMove = new ValueObj();
-			Terminate t = new Terminate();
 			int howDeep = 9;
 			while (true) {
 				System.err.println();
@@ -101,7 +101,6 @@ public class Main {
 
 							t.setIsTerminating(true);
 							R2.join();
-
 							sendMsg(Protocol.createMoveMsg(nextMove.getMove()));
 							System.err.println("MOVE;" + nextMove.getMove());
 						} else {
@@ -131,7 +130,7 @@ public class Main {
 							sendMsg(Protocol.createMoveMsg(nextMove.getMove()));
 							System.err.println("MOVE;" + nextMove.getMove());
 						}
-						
+
 						System.err.println("This was the move: " + r.move);
 						System.err.println("Is the game over? " + r.end);
 						if (!r.end)

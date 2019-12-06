@@ -2,6 +2,7 @@ package MKAgent;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Collections;
 import java.lang.Math;
 
@@ -13,19 +14,20 @@ class Search implements Runnable{
 	private Side side;
 	private ValueObj valueObject;
 	private Terminate isTerminating;
+	private static HashMap<Board, ValueObj> transposTable;
 
 	Search( String name, Board board, Side side, Terminate it, ValueObj vt) {
 		this.threadName = name;
 		this.board= board;
 		this.side = side;
-		this.valueObject = vt;
 		this.isTerminating = it;
+		this.valueObject = vt;
 	}
 
 	public void run() {
 		try {
-			search(board, side, this.valueObject, this.isTerminating);
-		} catch (InterruptedException e) {
+			search(board, side, 7, this.isTerminating);
+		} catch (Exception e) {
 			System.out.println("Thread " +  threadName + " interrupted.");
 		}
 	}
@@ -54,8 +56,8 @@ class Search implements Runnable{
 				beta = g.getValue() + 1;
 			else
 				beta = g.getValue();
-			
-			g = alphaBetaTT(board, beta - 1, beta, depth);
+
+			g = alphaBetaTT(board, side, beta - 1, beta, depth);
 
 			if (g.getValue() < beta)
 				upperbound = g.getValue();
@@ -65,28 +67,27 @@ class Search implements Runnable{
 		return g;
 	}
 
-	private alphaBetaTT(Board board, int depth, int alpha, int beta) {
-		ValueObj value = new ValueObj();
-		TTEntry tte = getTTEntry(board.hashValue());
-		if (tte != null && tte.depth >= depth) {
-			if (tte.type == EXACT) // stored value is exact
-				return tte.move;
-			if (tte.type == LOWERBOUND && tte.value > alpha)
-				alpha = tte.value; // update lowerbound alpha if needed
-			else if (tte.type == UPPERBOUND && tte.value < beta)
-				beta = tte.value; // update upperbound beta if needed
+	private static ValueObj alphaBetaTT(Board board, Side side, int depth, int alpha, int beta) {
+		ValueObj value = getTTValueObj(board);
+		if (value != null && value.getDepth() >= depth) {
+			if (value.getType() == 0) // stored value is exact
+				return value;
+			if (value.getType() == -1 && value.getValue() > alpha)
+				alpha = value.getValue(); // update lowerbound alpha if needed
+			else if (value.getType() == 1 && value.getValue() < beta)
+				beta = value.getValue(); // update upperbound beta if needed
 			if (alpha >= beta)
-				return tte.move; // if lowerbound surpasses upperbound
+				return value; // if lowerbound surpasses upperbound
 		}
 
 		if (depth == 0 || getSortedChildren(board, side).size() == 0) {
 			value.setValue(Evaluation.evaluate(board, side));
 			if (value.getValue() <= alpha) // a lowerbound value
-				storeTTEntry(board.hashCode(), value, LOWERBOUND, depth);
+				storeValueObjTT(board, value, -1, depth);
 			else if (value.getValue() >= beta)
-				storeTTEntry(board.hashCode(), value, UPPERBOUND, depth);
+				storeValueObjTT(board, value, 1, depth);
 			else
-				storeTTEntry(board.hashCode(), value, EXACT, depth);
+				storeValueObjTT(board, value, 0, depth);
 			return value;
 		}
 
@@ -110,18 +111,17 @@ class Search implements Runnable{
 			if (best.getValue() >= beta)
 				break; // Cut off the current branch
 		}
-		
+
 		if (best.getValue() <= alpha) // a lowerbound value
-			storeTTEntry(board.hashCode(), best, LOWERBOUND, depth);
+			storeValueObjTT(board, best, -1, depth);
 		else if (best.getValue() >= beta) // a upperbound value
-			storeTTEntry(board.hashCode(), best, UPPERBOUND, depth);
+			storeValueObjTT(board, best, 1, depth);
 		else	// a true minimax value
-			storeTTEntry(board.hashCode(), best, EXACT, depth);
-		
+			storeValueObjTT(board, best, 0, depth);
 		return best;
 	}
 
-	private ValueObj alphaBeta(Board board, Side side, int depth, double alpha, double beta) {
+	/* private static ValueObj alphaBeta(Board board, Side side, int depth, double alpha, double beta) {
 		ValueObj value = new ValueObj();
 		if (depth == 0 || getSortedChildren(board, side).size() == 0) {
 			value.setValue(Evaluation.evaluate(board, side));
@@ -149,7 +149,7 @@ class Search implements Runnable{
 		}
 
 		return best;
-	}
+	} */
 
 	public List<ValueObj> getSortedChildren(Board board, Side side) {
 		List<ValueObj> children = new ArrayList<ValueObj>();
@@ -161,7 +161,18 @@ class Search implements Runnable{
 		Collections.sort(children);
 		return children;
 	}
+
+	public static ValueObj getTTValueObj(Board board)
+	{
+		return transposTable.get(board);
+	}
+
+	public static void storeValueObjTT(Board board, ValueObj value, int type, int depth)
+	{
+		transposTable.put(board, new ValueObj(value.getMove(), value.getValue(), type, depth));
+	}
 }
+
 
 // The assumptions are:
 // We have the 'Board' passed in from the API.
