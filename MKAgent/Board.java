@@ -361,4 +361,13 @@ public class Board extends Observable implements Cloneable
 
 		return lookup3(key, 0, 14, 0);
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+	  int[][] other = ((Board) o).getBoard();
+	  for (int i = 1; i <= holes; i++)
+	     if (this.board[0][i] != other[0][i] || this.board[0][i] != other[0][i])
+	       return false;
+	  return true;
+	}
 }

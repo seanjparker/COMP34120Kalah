@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.EOFException;
 import java.io.Reader;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The main application class. It also provides methods for communication with
@@ -44,7 +45,7 @@ public class Main {
 	 * @return The message.
 	 * @throws IOException if there has been an I/O error.
 	 */
-	public static String recvMsg(Search R1) throws IOException {
+	public static String recvMsg(Search R1, Terminate t) throws IOException {
 		StringBuilder message = new StringBuilder();
 		int newCharacter;
 
@@ -66,8 +67,10 @@ public class Main {
 	 * The main method, invoked when the program is started.
 	 *
 	 * @param args Command line arguments.
+	 * @throws InterruptedException 
+	 * @throws CloneNotSupportedException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException, CloneNotSupportedException {
 		redirectSystemErr();
 		try {
 			Terminate t = new Terminate();
@@ -80,7 +83,7 @@ public class Main {
 				System.err.println();
 				t.setIsTerminating(false);
 				Search R1 = new Search( "Thread-1", board, side, t, nextMove);
-				s = recvMsg(R1);
+				s = recvMsg(R1, t);
 				System.err.print("Received: " + s);
 				try {
 					MsgType mt = Protocol.getMessageType(s);
@@ -101,8 +104,8 @@ public class Main {
 
 							t.setIsTerminating(true);
 							R2.join();
-							sendMsg(Protocol.createMoveMsg(nextMove.getMove()));
-							System.err.println("MOVE;" + nextMove.getMove());
+							sendMsg(Protocol.createMoveMsg(R2.getBestMove().getMove()));
+							System.err.println("MOVE;" + R2.getBestMove().getMove());
 						} else {
 							side = Side.NORTH;
 						}
@@ -118,7 +121,7 @@ public class Main {
 							side = side.opposite();
 						}
 						if (!r.end && r.again) {
-							Search R2 = new Search("Thread-1", board, side, t, nextMove);
+							Search R2 = new Search("Thread-2", board, side, t, nextMove);
 							t.setIsTerminating(false);
 							R2.start();
 
@@ -127,8 +130,8 @@ public class Main {
 							t.setIsTerminating(true);
 							R2.join();
 
-							sendMsg(Protocol.createMoveMsg(nextMove.getMove()));
-							System.err.println("MOVE;" + nextMove.getMove());
+							sendMsg(Protocol.createMoveMsg(R2.getBestMove().getMove()));
+							System.err.println("MOVE;" + R2.getBestMove().getMove());
 						}
 
 						System.err.println("This was the move: " + r.move);
