@@ -95,12 +95,15 @@ public class Main {
 						System.err.println("Starting player? " + first);
 						if (first) {
 							Board b = new Board(7, 7);
+							Kalah.secondMove = false;
+
 
 							Search R2 = new Search( "Thread-1", board, side, t, nextMove);
+							R2.search(board, side, new ValueObj(), t);
 							t.setIsTerminating(false);
 							R2.start();
 
-							TimeUnit.SECONDS.sleep(1);
+							TimeUnit.SECONDS.sleep(3);
 
 							t.setIsTerminating(true);
 							R2.join();
@@ -116,11 +119,14 @@ public class Main {
 						r = Protocol.interpretStateMsg(s, b);
 
 						board = b.clone();
-
 						if(r.move == -1) {
 							side = side.opposite();
 						}
-						if (!r.end && r.again) {
+						if (r.move >= 0 && r.move <= 2 && Kalah.secondMove) {
+							sendMsg(Protocol.createSwapMsg());
+							side = side.opposite();
+							System.err.println("Swapping sides");
+						} else if (!r.end && r.again) {
 							Search R2 = new Search("Thread-2", board, side, t, nextMove);
 							t.setIsTerminating(false);
 							R2.start();
@@ -130,10 +136,14 @@ public class Main {
 							t.setIsTerminating(true);
 							R2.join();
 
+							R2.search(board, side, new ValueObj(), t);
+
 							sendMsg(Protocol.createMoveMsg(R2.getBestMove().getMove()));
-							System.err.println("MOVE;" + R2.getBestMove().getMove());
+							System.err.println("MOVE;" + Protocol.createMoveMsg(R2.getBestMove().getMove()));
+
 						}
 
+						if (Kalah.secondMove) Kalah.secondMove = false;
 						System.err.println("This was the move: " + r.move);
 						System.err.println("Is the game over? " + r.end);
 						if (!r.end)

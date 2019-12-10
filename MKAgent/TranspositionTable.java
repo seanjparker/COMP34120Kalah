@@ -14,4 +14,7 @@ public class TranspositionTable {
   public static void put(Board board, ValueObj value, TTType type, int depth) {
     transposTable.put(board, new ValueObj(value.getMove(), value.getValue(), type, depth));
   }
+  public static void put(Board board, ValueObj entry) {
+    transposTable.put(board, entry.clone());
+  }
 }

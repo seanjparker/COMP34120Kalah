@@ -9,6 +9,8 @@ public class Kalah
      */
     private final Board board;
 
+		public static boolean secondMove = true;
+		
     /**
      * @param board The board to play on.
      * @throws NullPointerException if "board" is null.

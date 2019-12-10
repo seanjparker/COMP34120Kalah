@@ -54,7 +54,7 @@ public class ValueObj implements Comparable<Object> {
   }
 
   public ValueObj clone() {
-    return new ValueObj(this.move, this.value);
+    return new ValueObj(this.move, this.value, this.type, this.depth);
   }
 
   public int compareTo(Object o) {

@@ -51,76 +51,75 @@ class Search implements Runnable {
 
 	public void search(Board board, Side side, ValueObj vt, Terminate t) {
 		// ValueObj bestMove = null;
-		for (int i = 1; i <= 14; i++) {
-			vt = MTDf(board, side, vt, i);
+		for (int i = 1; i <= 9; i+=2) {
+			this.valueObject = alphaBetaTT(board, side, i, Integer.MIN_VALUE, Integer.MAX_VALUE);
 			if (t.getIsTerminating()) {
 				System.err.println("Early quit");
 				break;
 			}
 		}
-		this.valueObject = vt;
+
 		// return bestMove;
 	}
 
-	private ValueObj MTDf(Board board, Side side, ValueObj first, int depth) {
-		ValueObj g = first;
-		int beta, upperbound = Integer.MAX_VALUE, lowerbound = Integer.MIN_VALUE;
-		do {
-			if (g.getValue() == lowerbound)
-				beta = g.getValue() + 1;
-			else
-				beta = g.getValue();
+	// private ValueObj MTDf(Board board, Side side, ValueObj first, int depth) {
+	// 	ValueObj g = first;
+	// 	int beta, upperbound = Integer.MAX_VALUE, lowerbound = Integer.MIN_VALUE;
+	// 	do {
+	// 		if (g.getValue() == lowerbound)
+	// 			beta = g.getValue() + 1;
+	// 		else
+	// 			beta = g.getValue();
 
-			g = alphaBetaTT(board, 1, side, depth, beta - 1, beta);
+	// 		g = alphaBetaTT(board, 1, side, depth, beta - 1, beta);
 
-			if (g.getValue() < beta)
-				upperbound = g.getValue();
-			else
-				lowerbound = g.getValue();
-		} while (lowerbound < upperbound);
-		return g;
-	}
+	// 		if (g.getValue() < beta)
+	// 			upperbound = g.getValue();
+	// 		else
+	// 			lowerbound = g.getValue();
+	// 	} while (lowerbound < upperbound);
+	// 	return g;
+	// }
 
-	private ValueObj alphaBetaTT(Board board, int prevMove, Side side, int depth, int alpha, int beta) {
-		ValueObj value = TranspositionTable.get(board);
-		if (value != null && value.getDepth() >= depth) {
-		    // System.err.println("Found");
-			if (value.getType() == TTType.EXACT) // stored value is exact
-				return value;
-			if (value.getType() == TTType.LOWERBOUND && value.getValue() > alpha)
-				alpha = value.getValue(); // update lowerbound alpha if needed
-			else if (value.getType() == TTType.UPPERBOUND && value.getValue() < beta)
-				beta = value.getValue(); // update upperbound beta if needed
+	private ValueObj alphaBetaTT(Board board, Side side, int depth, int alpha, int beta) {
+		ValueObj ttentry = TranspositionTable.get(board);
+		if (ttentry != null && ttentry.getDepth() >= depth) {
+			if (ttentry.getType() == TTType.EXACT) // stored value is exact
+				return ttentry;
+			if (ttentry.getType() == TTType.LOWERBOUND && ttentry.getValue() > alpha)
+				alpha = ttentry.getValue(); // update lowerbound alpha if needed
+			else if (ttentry.getType() == TTType.UPPERBOUND && ttentry.getValue() < beta)
+				beta = ttentry.getValue(); // update upperbound beta if needed
 			if (alpha >= beta)
-				return value; // if lowerbound surpasses upperbound
+				return ttentry; // if lowerbound surpasses upperbound
 		}
-        if (value == null) value = new ValueObj();
         
-        List<ValueObj> children = getSortedChildren(board, side);
+		List<ValueObj> children = getSortedChildren(board, side);
         
 		if (depth == 0 || children.size() == 0) {
-			value.setValue(Evaluation.evaluate(board, side));
-			value.setMove(prevMove);
-			if (value.getValue() <= alpha) // a lowerbound value
-				TranspositionTable.put(board, value, TTType.LOWERBOUND, depth);
-			else if (value.getValue() >= beta)
-				TranspositionTable.put(board, value, TTType.UPPERBOUND, depth);
-			else
-				TranspositionTable.put(board, value, TTType.EXACT, depth);
-			return value;
+			ValueObj terminal = new ValueObj();
+			terminal.setValue(Evaluation.evaluate(board, side));
+			// if (terminal.getValue() <= alpha) // a lowerbound value
+			// 	TranspositionTable.put(board, terminal, TTType.LOWERBOUND, depth);
+			// else if (terminal.getValue() >= beta)
+			// 	TranspositionTable.put(board, terminal, TTType.UPPERBOUND, depth);
+			// else
+			// 	TranspositionTable.put(board, terminal, TTType.EXACT, depth);
+			return terminal;
 		}
 
 		ValueObj best = new ValueObj();
+		ValueObj value = null;
 		best.setValue(Integer.MIN_VALUE);
 
 		for (int i = 0; i < children.size(); i++) {
 			Board nextBoard = new Board(board);
 			Kalah.makeMove(nextBoard, new Move(side, children.get(i).getMove()));
-			value = alphaBetaTT(nextBoard, children.get(i).getMove(), side.opposite(), depth - 1, -beta, -alpha);
+			value = alphaBetaTT(nextBoard, side.opposite(), depth - 1, -beta, -alpha);
 			value.setValue(-value.getValue());
 
 			// Value is a better move than best
-			if (value.compareTo(best) > 0) {
+			if (value.compareTo(best) >= 0) {
 				value.setMove(children.get(i).getMove());
 				best = value.clone();
 			}
@@ -143,10 +142,10 @@ class Search implements Runnable {
 		List<ValueObj> children = new ArrayList<ValueObj>();
 		for (int i = 1; i <= board.getNoOfHoles(); i++) {
 			if (board.getSeeds(side, i) != 0) {
-				children.add(new ValueObj(i, Evaluation.quickEval(board, side)));
+				children.add(new ValueObj(i, Evaluation.evaluate(board, side)));
 			}
 		}
-		Collections.sort(children);
+		//Collections.sort(children);
 		return children;
 	}
 
