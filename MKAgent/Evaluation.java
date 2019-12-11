@@ -84,7 +84,7 @@ public class Evaluation {
 						 (v6+v7)/2
 						)*0.0);
 		// System.err.println(result);
-		return result;
+		return scorePitDifference(board, side);
 
 		// int v1 = scorePitDifference(board, side) * 5;
 		// int v2 = seedDifference(board, side) / 1;
