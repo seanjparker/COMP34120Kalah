@@ -78,11 +78,10 @@ public class Main {
 			String s;
 			Board board = new Board(7, 7);
 			ValueObj nextMove = new ValueObj();
-			int howDeep = 9;
 			while (true) {
 				System.err.println();
 				t.setIsTerminating(false);
-				Search R1 = new Search( "Thread-1", board, side, t, nextMove);
+				Search R1 = new Search( "Waiting", board, side, t, nextMove, true);
 				s = recvMsg(R1, t);
 				System.err.print("Received: " + s);
 				try {
@@ -94,12 +93,9 @@ public class Main {
 						boolean first = Protocol.interpretStartMsg(s);
 						System.err.println("Starting player? " + first);
 						if (first) {
-							Board b = new Board(7, 7);
 							Kalah.secondMove = false;
-
-
-							Search R2 = new Search( "Thread-1", board, side, t, nextMove);
-							R2.search(board, side, new ValueObj(), t);
+							
+							Search R2 = new Search( "FirstMove", board, side, t, nextMove, false);
 							t.setIsTerminating(false);
 							R2.start();
 
@@ -127,7 +123,7 @@ public class Main {
 							side = side.opposite();
 							System.err.println("Swapping sides");
 						} else if (!r.end && r.again) {
-							Search R2 = new Search("Thread-2", board, side, t, nextMove);
+							Search R2 = new Search("Thread-2", board, side, t, nextMove, false);
 							t.setIsTerminating(false);
 							R2.start();
 
@@ -135,8 +131,6 @@ public class Main {
 
 							t.setIsTerminating(true);
 							R2.join();
-
-							R2.search(board, side, new ValueObj(), t);
 
 							sendMsg(Protocol.createMoveMsg(R2.getBestMove().getMove()));
 							System.err.println("MOVE;" + Protocol.createMoveMsg(R2.getBestMove().getMove()));

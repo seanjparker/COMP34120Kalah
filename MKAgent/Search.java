@@ -14,20 +14,22 @@ class Search implements Runnable {
 	private Side side;
 	private ValueObj valueObject;
 	private Terminate isTerminating;
+	private boolean isWaiting;
 
 
-	Search(String name, Board board, Side side, Terminate it, ValueObj vt) {
+	Search(String name, Board board, Side side, Terminate it, ValueObj vt, boolean isW) {
 		this.threadName = name;
 		this.board= board;
 		this.side = side;
 		this.isTerminating = it;
 		this.valueObject = vt;
 		this.valueObject.setValue(0);
+		this.isWaiting = isW;
 	}
 
 	public void run() {
 		try {
-			search(board, side, this.valueObject, this.isTerminating);
+			search(board, side, this.valueObject, this.isTerminating, this.isWaiting);
 		} catch (Exception e) {
 			System.out.println("Thread " +  threadName + " interrupted.");
 		}
@@ -49,16 +51,32 @@ class Search implements Runnable {
         }
 	}
 
-	public void search(Board board, Side side, ValueObj vt, Terminate t) {
+	public void search(Board board, Side side, ValueObj vt, Terminate t, boolean is) {
 		// ValueObj bestMove = null;
-		for (int i = 1; i <= 9; i+=2) {
-			this.valueObject = alphaBetaTT(board, side, i, Integer.MIN_VALUE, Integer.MAX_VALUE);
+		List<Board> children = getChildren(board, side.opposite());
+		for (int i = 1; i <= 8; i++) {
+			
+			if(is){
+				for (int j = 0; j < children.size(); j++) {
+					if(children.get(j).getSeedsInStore(side)> board.getSeedsInStore(side) &&
+						children.get(j).getSeeds(side.opposite(), 1) == board.getSeeds(side.opposite(), 1)){
+							vt = alphaBetaTT(children.get(j), side, i, Integer.MIN_VALUE, Integer.MAX_VALUE);
+					}else{
+						vt = alphaBetaTT(children.get(j), side.opposite(), i, Integer.MIN_VALUE, Integer.MAX_VALUE);
+					}
+				}
+				System.err.print("w");
+			}else{
+				this.valueObject = alphaBetaTT(board, side, i, Integer.MIN_VALUE, Integer.MAX_VALUE);
+			}
+			this.valueObject.setDepth(i);
 			if (t.getIsTerminating()) {
 				System.err.println("Early quit");
 				break;
 			}
+			
 		}
-
+		System.err.println(vt);
 		// return bestMove;
 	}
 
@@ -98,6 +116,7 @@ class Search implements Runnable {
         
 		if (depth == 0 || children.size() == 0) {
 			ValueObj terminal = new ValueObj();
+			// terminal.setDepth(depth);
 			terminal.setValue(Evaluation.evaluate(board, side));
 			// if (terminal.getValue() <= alpha) // a lowerbound value
 			// 	TranspositionTable.put(board, terminal, TTType.LOWERBOUND, depth);
@@ -114,9 +133,15 @@ class Search implements Runnable {
 
 		for (int i = 0; i < children.size(); i++) {
 			Board nextBoard = new Board(board);
-			Kalah.makeMove(nextBoard, new Move(side, children.get(i).getMove()));
-			value = alphaBetaTT(nextBoard, side.opposite(), depth - 1, -beta, -alpha);
-			value.setValue(-value.getValue());
+			Side nextTurn = Kalah.makeMove(nextBoard, new Move(side, children.get(i).getMove()));
+			if(nextTurn == side.opposite()){
+				value = alphaBetaTT(nextBoard, side.opposite(), depth - 1, -beta, -alpha);
+				value.setValue(-value.getValue());
+			}else{
+				value = alphaBetaTT(nextBoard, side, depth - 1, alpha, beta);
+			}
+			
+			
 
 			// Value is a better move than best
 			if (value.compareTo(best) >= 0) {
@@ -148,6 +173,24 @@ class Search implements Runnable {
 		//Collections.sort(children);
 		return children;
 	}
+
+	public static ArrayList<Board> getChildren(Board board, Side side) {
+		ArrayList<Board> children = new ArrayList<Board>();
+		Board originalBoard = new Board(board);
+	  	boolean hasChildren=false;
+		for (int i = 1; i <= originalBoard.getNoOfHoles(); i++) {
+		  	if (originalBoard.getSeeds(side, i) > 0) {
+				Move newmove = new Move(side, i);
+				Kalah.makeMove(originalBoard,newmove);
+				children.add(originalBoard);
+				originalBoard= new Board(board);
+				hasChildren=true;
+			}
+		}
+		if(!hasChildren)
+			children=null;
+		return children;
+	  }
 
 	public ValueObj getBestMove() {
 		return this.valueObject;
