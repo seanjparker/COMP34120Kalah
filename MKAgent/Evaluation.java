@@ -33,10 +33,10 @@ public class Evaluation {
 	* Check for vunerable stones
 	*/
   public static int evaluate(final Board board, final Side side) {
-	  	int detail = 2000;
+	  	int detail = 1;
 		double v1 = ((scorePitDifference(board, side)+98)/(98.0*2)) * detail;
-		System.err.println(side);
-		System.err.print(board);
+		// System.err.println(side);
+		// System.err.print(board);
 		// System.err.println(v1);
 		double v2 = ((seedDifference(board, side)+20)/(20.0*2)) *detail;
 		// System.err.println(v2);
@@ -65,25 +65,25 @@ public class Evaluation {
 		// System.err.println(v1*0.4 +((v2+v3+v4+v5+v6+v7)/6)*0.6);
 		int result = (int) Math.round(
 						(
-							v1 * 0.5 +
+							v1 * 1 +
 							v2 * 0.0 +
 							(
 								v3 * 0.5 +
 								v4 * 0.5
-							) * 0.2 + 
+							) * 0.0 + 
 							(
 								v9 * 0.5 +
 								v10 * 0.5
-							) * 0.2 + 
+							) * 0.0 + 
 							(
 								v5 * 0.5 + 
 								v6 * 0.5
-							) * 0.1 
-						)*0.49
+							) * 0.0 
+						)*1
 						+(
 						 (v6+v7)/2
-						)*0.51);
-		System.err.println(result);
+						)*0.0);
+		// System.err.println(result);
 		return result;
 
 		// int v1 = scorePitDifference(board, side) * 5;
@@ -102,20 +102,22 @@ public class Evaluation {
 	}
 
 	public static int quickEval(final Board board, final Side side) {
-		int v1 = scorePitDifference(board, side) * 3;
+		int v1 = scorePitDifference(board, side);
 		int v3 = extraMove(board, side) * 4;
 		int v8 = -captureStones(board, side) * 2;
 		int v6 = haveHalfStoneTotal(board, side) * 10000;
 		int v7 = -haveHalfStoneTotal(board, side.opposite()) * 10000;
-		return v1 + v3 + v6 + v7 + v8;
+		return v1 + v3 + v8 + v6 + v7;
 	}
 
 	// Heuristic 1
+	// Min = -98, max = 98
 	private static int scorePitDifference(final Board board, final Side side) {
 		return board.getSeedsInStore(side) - board.getSeedsInStore(side.opposite());
 	}
 
 	// Heuristic 2
+	// Min = -98, max = 98
 	private static int seedDifference(final Board board, final Side side) {
 		int numStonesOurPits = 0;
 		int numStonesOpponentPits = 0;
@@ -127,7 +129,8 @@ public class Evaluation {
 	}
 
 	// Heuristic 3
-	private static int extraMove(final Board board, final Side side){
+	// min = 0, max = 7
+	private static int extraMove(final Board board, final Side side) {
 		int value = 0;
 		int holes = board.getNoOfHoles();
 
@@ -140,6 +143,7 @@ public class Evaluation {
 	}
 
 	// Heuristic 4
+	// min = 
 	private static int clusterToScorePit(final Board board, final Side side) {
 		int value = 0;
 		for (int i = 1; i <= board.getNoOfHoles(); i++) {
@@ -190,7 +194,7 @@ public class Evaluation {
 				}
 			}
 		}
-		return Math.max(wholeBoardCapture, Math.max(leftCapture, rightCapture));
+		return Math.max(leftCapture, rightCapture);
 	}
 
 }

@@ -49,7 +49,7 @@ public class Main {
 		StringBuilder message = new StringBuilder();
 		int newCharacter;
 
-		R1.start();
+		// R1.start();
 		
 		do {
 			newCharacter = input.read();
@@ -58,8 +58,8 @@ public class Main {
 			message.append((char) newCharacter);
 		} while ((char) newCharacter != '\n');
 
-		t.setIsTerminating(true);
-		R1.join();
+		// t.setIsTerminating(true);
+		// R1.join();
 		return message.toString();
 	}
 
@@ -78,10 +78,11 @@ public class Main {
 			String s;
 			Board board = new Board(7, 7);
 			ValueObj nextMove = new ValueObj();
+			int howDeep = 9;
 			while (true) {
 				System.err.println();
 				t.setIsTerminating(false);
-				Search R1 = new Search( "Waiting", board, side, t, nextMove, true);
+				Search R1 = new Search( "Thread-1", board, side, t, nextMove);
 				s = recvMsg(R1, t);
 				System.err.print("Received: " + s);
 				try {
@@ -93,16 +94,19 @@ public class Main {
 						boolean first = Protocol.interpretStartMsg(s);
 						System.err.println("Starting player? " + first);
 						if (first) {
+							Board b = new Board(7, 7);
 							Kalah.secondMove = false;
-							
-							Search R2 = new Search( "FirstMove", board, side, t, nextMove, false);
-							t.setIsTerminating(false);
-							R2.start();
 
-							TimeUnit.SECONDS.sleep(3);
 
-							t.setIsTerminating(true);
-							R2.join();
+							Search R2 = new Search( "Thread-1", board, side, t, nextMove);
+							R2.search(board, side, new ValueObj(), t);
+							// t.setIsTerminating(false);
+							// R2.start();
+
+							// TimeUnit.SECONDS.sleep(3);
+
+							// t.setIsTerminating(true);
+							// R2.join();
 							sendMsg(Protocol.createMoveMsg(R2.getBestMove().getMove()));
 							System.err.println("MOVE;" + R2.getBestMove().getMove());
 						} else {
@@ -123,14 +127,16 @@ public class Main {
 							side = side.opposite();
 							System.err.println("Swapping sides");
 						} else if (!r.end && r.again) {
-							Search R2 = new Search("Thread-2", board, side, t, nextMove, false);
-							t.setIsTerminating(false);
-							R2.start();
+							Search R2 = new Search("Thread-2", board, side, t, nextMove);
+							// t.setIsTerminating(false);
+							// R2.start();
 
-							TimeUnit.SECONDS.sleep(1);
+							// TimeUnit.SECONDS.sleep(1);
 
-							t.setIsTerminating(true);
-							R2.join();
+							// t.setIsTerminating(true);
+							// R2.join();
+
+							R2.search(board, side, new ValueObj(), t);
 
 							sendMsg(Protocol.createMoveMsg(R2.getBestMove().getMove()));
 							System.err.println("MOVE;" + Protocol.createMoveMsg(R2.getBestMove().getMove()));
