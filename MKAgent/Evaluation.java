@@ -33,8 +33,9 @@ public class Evaluation {
 	* Check for vunerable stones
 	*/
   public static int evaluate(final Board board, final Side side) {
-	  	int detail = 1;
-		double v1 = ((scorePitDifference(board, side)+98)/(98.0*2)) * detail;
+		
+		int detail = 50;
+		double v1 = (scorePitDifference(board, side))*51;
 		// System.err.println(side);
 		// System.err.print(board);
 		// System.err.println(v1);
@@ -63,30 +64,29 @@ public class Evaluation {
 		// System.err.printf("pit diff = %d, seed diff = %d, extra move = %d, cluster = %d, -cluster = %d, half total = %d, -halftotal = %d, cap = %d, -cap = %d\n\n", v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
 		// System.err.println(v1*0.4 +((v2+v3+v4+v5+v6+v7)/6)*0.6);
-		int result = (int) Math.round(
-						(
-							v1 * 1 +
-							v2 * 0.0 +
-							(
-								v3 * 0.5 +
-								v4 * 0.5
-							) * 0.0 + 
-							(
-								v9 * 0.5 +
-								v10 * 0.5
-							) * 0.0 + 
-							(
-								v5 * 0.5 + 
-								v6 * 0.5
-							) * 0.0 
-						)*1
-						+(
-						 (v6+v7)/2
-						)*0.0);
-		// System.err.println(result);
+		int result = (int) Math.round(v1 
+							+ (
+								v2 * 0.2 +
+								(
+									v3 * 0.5 +
+									v4 * 0.5
+								) * 0.3 + 
+								(
+									v9 * 0.5 +
+									v10 * 0.5
+								) * 0.3 + 
+								(
+									v5 * 0.5 + 
+									v6 * 0.5
+								) * 0.2 
+							)*0.49
+							+(
+							(v7+v8)/2
+							)*0.51
+						);
 		return result;
 
-		// int v1 = scorePitDifference(board, side) * 5;
+		// v1 = scorePitDifference(board, side) * 5;
 		// int v2 = seedDifference(board, side) / 1;
 		// int v3 = extraMove(board, side) * 2;
 		// int v4 = clusterToScorePit(board, side) / 1;
@@ -98,7 +98,7 @@ public class Evaluation {
 
 		// // System.err.printf("pit diff = %d, seed diff = %d, extra move = %d, cluster = %d, -cluster = %d, half total = %d, -halftotal = %d, cap = %d, -cap = %d\n\n", v1, v2, v3, v4, v5, v6, v7, v8, v9);
 
-		// return v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9;
+		// return (int) Math.round(v1);
 	}
 
 	public static int quickEval(final Board board, final Side side) {
