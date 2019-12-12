@@ -41,7 +41,7 @@ class Search implements Runnable {
 			t.start();
 		}
 	}
-	
+
 	public void join() {
 	    if (t != null)
         try {
@@ -56,7 +56,7 @@ class Search implements Runnable {
 
 		// List<Board> children = getChildren(board, side.opposite());
 		// for (int i = 1; i <= 8; i++) {
-			
+
 		// 	if(is){
 		// 		for (int j = 0; j < children.size(); j++) {
 		// 			if(children.get(j).getSeedsInStore(side)> board.getSeedsInStore(side) &&
@@ -75,12 +75,12 @@ class Search implements Runnable {
 		// 		System.err.println("Early quit");
 		// 		break;
 		// 	}
-			
+
 		// }
 		// System.err.println(vt);
 
 		// for (int i = 1; i <= 9; i+=2) {
-		this.valueObject = alphaBetaTT(board, side, 7, Integer.MIN_VALUE, Integer.MAX_VALUE, true, false);
+		this.valueObject = alphaBetaTT(board, side, 9, -1000000, 1000000, false);
 		System.err.println(this.valueObject);
 		// 	if (t.getIsTerminating()) {
 		// 		System.err.println("Early quit");
@@ -110,7 +110,7 @@ class Search implements Runnable {
 	// 	return g;
 	// }
 
-	private ValueObj alphaBetaTT(Board board, Side side, int depth, int alpha, int beta, boolean maximisingPlayer, boolean samePlayer) {
+	private ValueObj alphaBetaTT(Board board, Side side, int depth, int alpha, int beta, boolean samePlayer) {
 		// ValueObj ttentry = TranspositionTable.get(board);
 		// if (ttentry != null && ttentry.getDepth() >= depth) {
 		// 	if (ttentry.getType() == TTType.EXACT) // stored value is exact
@@ -122,9 +122,9 @@ class Search implements Runnable {
 		// 	if (alpha >= beta)
 		// 		return ttentry; // if lowerbound surpasses upperbound
 		// }
-        
+
 		List<ValueObj> children = getSortedChildren(board, side);
-        
+
 		if (depth == 0 || children.size() == 0) {
 			ValueObj terminal = new ValueObj();
 			// terminal.setDepth(depth);
@@ -137,79 +137,56 @@ class Search implements Runnable {
 			// 	TranspositionTable.put(board, terminal, TTType.EXACT, depth);
 			return terminal;
 		}
-		
+
 		if (samePlayer) {
-			ValueObj tempMove = alphaBetaTT(board, side.opposite(), depth - 1, alpha, beta, !maximisingPlayer, false);
-			// tempMove.setValue(-tempMove.getValue());
+			Board nextBoard = new Board(board);
+			ValueObj tempMove = alphaBetaTT(board, side.opposite(), depth - 1, -beta, -alpha, false);
+				 tempMove.setValue(-tempMove.getValue());
 			return tempMove;
 		}
-		
-		if (maximisingPlayer) {
-			ValueObj value = new ValueObj();
-			value.setValue(Integer.MIN_VALUE);
 
-			for (int i = 0; i < children.size(); i++) {
-				Board nextBoard = new Board(board);
-				
-				Side nextSide = Kalah.makeMove(nextBoard, new Move(side, children.get(i).getMove()));
-	
-				ValueObj current = alphaBetaTT(
-					nextBoard,
-					side.opposite(),
-					nextSide == side ? depth : depth - 1,
-					alpha,
-					beta,
-					!maximisingPlayer,
-					nextSide == side
-				);
-				
-	
-				// Value is a better move than best
-				if (current.getValue() >= value.getValue()) {
-					value = current.clone();
-					value.setMove(children.get(i).getMove());
-				}
 
-				if (value.getValue() > alpha)
-					alpha = value.getValue();
-				if (alpha >= beta)
-					break; // Cut off the current branch
+		ValueObj best = new ValueObj();
+	ValueObj value = null;
+	best.setValue(-1000000);
+	for (int i = 0; i < children.size(); i++) {
+			Board nextBoard = new Board(board);
+			// Side nextTurn = Kalah.makeMove(nextBoard, new Move(side, children.get(i).getMove()));
+			// if(nextTurn == side.opposite()){
+			// 	value = alphaBetaTT(nextBoard, side.opposite(), depth - 1, -beta, -alpha);
+			// 	value.setValue(-value.getValue());
+			// }else{
+			// 	value = alphaBetaTT(nextBoard, side, depth - 1, alpha, beta);
+			// }
+
+			Side nextSide = Kalah.makeMove(nextBoard, new Move(side, children.get(i).getMove()));
+
+			value = alphaBetaTT(
+				nextBoard,
+				side.opposite(),
+				nextSide == side ? depth : depth - 1,
+				-beta,
+				-alpha,
+				nextSide == side
+			);
+			value.setValue(-value.getValue());
+
+			// Value is a better move than best
+			if (value.compareTo(best) >= 0) {
+				value.setMove(children.get(i).getMove());
+				best = value.clone();
+
 			}
-			return value;
-		} else {
-			ValueObj value = new ValueObj();
-			value.setValue(Integer.MAX_VALUE);
+			if (best.getValue() > -beta){
+				alpha = best.getValue();}
 
-			for (int i = 0; i < children.size(); i++) {
-				Board nextBoard = new Board(board);
-				
-				Side nextSide = Kalah.makeMove(nextBoard, new Move(side, children.get(i).getMove()));
-	
-				ValueObj current = alphaBetaTT(
-					nextBoard,
-					side.opposite(),
-					nextSide == side ? depth : depth - 1,
-					alpha,
-					beta,
-					!maximisingPlayer,
-					nextSide == side
-				);
-				
-	
-				// Value is a better move than best
-				if (current.getValue() <= value.getValue()) {
-					value = current.clone();
-					value.setMove(children.get(i).getMove());
-				}
-
-				if (value.getValue() < beta)
-					beta = value.getValue();
-				if (alpha >= beta)
-					break; // Cut off the current branch
+			 if (alpha > beta){
+				 //System.err.println("Alpha "+best.getMove());
+			 	//return best; // Cut off the current branch
 			}
-			return value;
+
 		}
-
+return best;
 
 		// if (best.getValue() <= alpha) // a lowerbound value
 		// 	TranspositionTable.put(board, best, TTType.LOWERBOUND, depth);
