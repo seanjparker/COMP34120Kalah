@@ -55,15 +55,15 @@ echo "START" > $RESULTS
 
 case "$1" in
     -a|--all)
-        echo "P2" > $RESULTS
+        echo "P2" >> $RESULTS
         north
         ;;
     -s|--south)
-        echo "P1" > $RESULTS
+        echo "P1" >> $RESULTS
         south
         ;;
     *)
-        echo "P2" > $RESULTS
+        echo "P2" >> $RESULTS
         some
         ;;
 esac
