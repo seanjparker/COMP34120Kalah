@@ -23,7 +23,7 @@ public class Evaluation {
 		Evaluation.h6 = 3;
 	}
 
-	/* 
+	/*
 	* Value function takes into account the following:
 	* Stones on our side - Stones on their side
 	* Stones in our kalahah - Stones in their kalahah
@@ -70,21 +70,23 @@ public class Evaluation {
 							(
 								v3 * 0.5 +
 								v4 * 0.5
-							) * 0.0 + 
+							) * 0.0 +
 							(
 								v9 * 0.5 +
 								v10 * 0.5
-							) * 0.0 + 
+							) * 0.0 +
 							(
-								v5 * 0.5 + 
+								v5 * 0.5 +
 								v6 * 0.5
-							) * 0.0 
+							) * 0.0
 						)*1
 						+(
 						 (v6+v7)/2
 						)*0.0);
 		// System.err.println(result);
-		return scorePitDifference(board, side);
+		int v60 = haveHalfStoneTotal(board, side) * 10000;
+		int v70 = -haveHalfStoneTotal(board, side.opposite()) * 10000;
+		return scorePitDifference(board, side)+v60+v70;
 
 		// int v1 = scorePitDifference(board, side) * 5;
 		// int v2 = seedDifference(board, side) / 1;
@@ -143,7 +145,7 @@ public class Evaluation {
 	}
 
 	// Heuristic 4
-	// min = 
+	// min =
 	private static int clusterToScorePit(final Board board, final Side side) {
 		int value = 0;
 		for (int i = 1; i <= board.getNoOfHoles(); i++) {
@@ -182,7 +184,7 @@ public class Evaluation {
 			// Find the maximum number of seeds that can be captured on the same side
 			for (int i = 1; i < seed; i++) {
 				if (board.getSeeds(side, i) == seed - i) {
-					
+
 					leftCapture = Math.max(leftCapture, board.getSeeds(side.opposite(), 8-seed) + 1);
 				}
 			}
