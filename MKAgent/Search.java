@@ -80,7 +80,7 @@ class Search implements Runnable {
 		// System.err.println(vt);
 
 		// for (int i = 1; i <= 9; i+=2) {
-		this.valueObject = alphaBetaTT(board, side, 7, -1000000, 1000000, false);
+		this.valueObject = alphaBetaTT(board, side, 9, -1000000, 1000000, false);
 		System.err.println(this.valueObject);
 		// 	if (t.getIsTerminating()) {
 		// 		System.err.println("Early quit");
@@ -177,12 +177,12 @@ class Search implements Runnable {
 				best = value.clone();
 
 			}
-			if (best.getValue() > -beta){
+			if (best.getValue() > alpha){
 				alpha = best.getValue();}
 
 			 if (alpha > beta){
 				 //System.err.println("Alpha "+best.getMove());
-			 	return best; // Cut off the current branch
+			 return best; // Cut off the current branch
 			}
 
 		}
