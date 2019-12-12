@@ -59,25 +59,25 @@ public class Evaluation {
 		  double v10 = (captureStones(board, side)/20.0) * detail;
 		  // System.err.println(v9);
 		  // System.err.println(v10);
-  
+
 		  // System.err.printf("pit diff = %d, seed diff = %d, extra move = %d, cluster = %d, -cluster = %d, half total = %d, -halftotal = %d, cap = %d, -cap = %d\n\n", v1, v2, v3, v4, v5, v6, v7, v8, v9);
-  
+
 		  // System.err.println(v1*0.4 +((v2+v3+v4+v5+v6+v7)/6)*0.6);
-		  int result = (int) Math.round(v1 
+		  int result = (int) Math.round(v1
 							  + (
 								  v2 * 0.2 +
 								  (
 									  v3 * 0.5 +
 									  v4 * 0.5
-								  ) * 0.3 + 
+								  ) * 0.3 +
 								  (
 									  v9 * 0.5 +
 									  v10 * 0.5
-								  ) * 0.3 + 
+								  ) * 0.3 +
 								  (
-									  v5 * 0.5 + 
+									  v5 * 0.5 +
 									  v6 * 0.5
-								  ) * 0.2 
+								  ) * 0.2
 							  )*0.49
 							  +(
 							  (v7+v8)/2
@@ -129,7 +129,7 @@ public class Evaluation {
 
 	// Heuristic 3
 	// min = 0, max = 7
-	private static int extraMove(final Board board, final Side side) {
+	public static int extraMove(final Board board, final Side side) {
 		int value = 0;
 		int holes = board.getNoOfHoles();
 

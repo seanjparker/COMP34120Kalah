@@ -80,8 +80,13 @@ class Search implements Runnable {
 		// System.err.println(vt);
 
 		// for (int i = 1; i <= 9; i+=2) {
-		this.valueObject = alphaBetaTT(board, side, 9, -1000000, 1000000, false);
-		System.err.println(this.valueObject);
+		if(board.getSeedsInStore(Side.SOUTH)<50 ||board.getSeedsInStore(Side.NORTH)<50 ){
+			this.valueObject = alphaBetaTT(board, side, 9, -1000000, 1000000, false,false);
+			System.err.println(this.valueObject);
+	}
+		else{
+			this.valueObject = alphaBetaTT(board, side, 1, -1000000, 1000000, false,true);
+		}
 		// 	if (t.getIsTerminating()) {
 		// 		System.err.println("Early quit");
 		// 		break;
@@ -110,7 +115,7 @@ class Search implements Runnable {
 	// 	return g;
 	// }
 
-	private ValueObj alphaBetaTT(Board board, Side side, int depth, int alpha, int beta, boolean samePlayer) {
+	private ValueObj alphaBetaTT(Board board, Side side, int depth, int alpha, int beta, boolean samePlayer,boolean extraMoveEval) {
 		// ValueObj ttentry = TranspositionTable.get(board);
 		// if (ttentry != null && ttentry.getDepth() >= depth) {
 		// 	if (ttentry.getType() == TTType.EXACT) // stored value is exact
@@ -128,7 +133,11 @@ class Search implements Runnable {
 		if (depth == 0 || children.size() == 0) {
 			ValueObj terminal = new ValueObj();
 			// terminal.setDepth(depth);
-			terminal.setValue(Evaluation.evaluate(board, side));
+			if(extraMoveEval==false){
+				terminal.setValue(Evaluation.evaluate(board, side));
+			}else{
+				terminal.setValue(Evaluation.extraMove(board, side));
+			}
 			// if (terminal.getValue() <= alpha) // a lowerbound value
 			// 	TranspositionTable.put(board, terminal, TTType.LOWERBOUND, depth);
 			// else if (terminal.getValue() >= beta)
@@ -140,7 +149,7 @@ class Search implements Runnable {
 
 		if (samePlayer) {
 			Board nextBoard = new Board(board);
-			ValueObj tempMove = alphaBetaTT(board, side.opposite(), depth - 1, -beta, -alpha, false);
+			ValueObj tempMove = alphaBetaTT(board, side.opposite(), depth - 1, -beta, -alpha, false,extraMoveEval);
 				 tempMove.setValue(-tempMove.getValue());
 			return tempMove;
 		}
@@ -167,7 +176,8 @@ class Search implements Runnable {
 				nextSide == side ? depth : depth - 1,
 				-beta,
 				-alpha,
-				nextSide == side
+				nextSide == side,
+				extraMoveEval
 			);
 			value.setValue(-value.getValue());
 
