@@ -23,7 +23,7 @@ south()
     echo "MKREF"
     java -jar ManKalah.jar "java -jar Agent.jar" "java -jar MKRefAgent.jar" >> $RESULTS
 
-    for file in ./Agents/error404.jar; do 
+    for file in ./Agents/*.jar; do 
         echo "${file##*/}"  >> $RESULTS
         echo "${file##*/}"
         java -jar ManKalah.jar "java -jar Agent.jar" "java -jar $file" >> $RESULTS
@@ -55,12 +55,15 @@ echo "START" > $RESULTS
 
 case "$1" in
     -a|--all)
+        echo "P2"
         north
         ;;
     -s|--south)
+        echo "P1"
         south
         ;;
     *)
+        echo "P2"
         some
         ;;
 esac
