@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Run this command to launch it without compiling the jar
-# java -cp bin MKAgent.Main 
+# java -cp ./bin MKAgent.Main 
 compile()
 {
   if [ -f Agent.jar ]; then
@@ -11,7 +11,7 @@ compile()
     mkdir bin
   fi
   javac MKAgent/Main.java -d bin
-  jar cfm Agent.jar META-INF/MANIFEST.MF -C bin .
+  jar cfm Group2Agent.jar META-INF/MANIFEST.MF -C bin .
 }
 
 run()
