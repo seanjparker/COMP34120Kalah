@@ -20,14 +20,6 @@ public class Main {
 	 */
 	private static Reader input = new BufferedReader(new InputStreamReader(System.in));
 
-	private static void redirectSystemErr() {
-		try {
-			System.setErr(new PrintStream(new FileOutputStream(System.getProperty("user.dir") + "/KalahLog" + ".log")));
-		} catch (Exception ex) {
-			System.err.println("Exception " + ex.getMessage());
-		}
-	}
-
 	/**
 	 * Sends a message to the game engine.
 	 *
@@ -45,11 +37,9 @@ public class Main {
 	 * @return The message.
 	 * @throws IOException if there has been an I/O error.
 	 */
-	public static String recvMsg(Search R1, Terminate t) throws IOException {
+	public static String recvMsg() throws IOException {
 		StringBuilder message = new StringBuilder();
 		int newCharacter;
-
-		// R1.start();
 		
 		do {
 			newCharacter = input.read();
@@ -58,8 +48,6 @@ public class Main {
 			message.append((char) newCharacter);
 		} while ((char) newCharacter != '\n');
 
-		// t.setIsTerminating(true);
-		// R1.join();
 		return message.toString();
 	}
 
@@ -71,19 +59,14 @@ public class Main {
 	 * @throws CloneNotSupportedException 
 	 */
 	public static void main(String[] args) throws InterruptedException, CloneNotSupportedException {
-		redirectSystemErr();
 		try {
-			Terminate t = new Terminate();
 			Side side = Side.SOUTH;
 			String s;
 			Board board = new Board(7, 7);
 			ValueObj nextMove = new ValueObj();
-			int howDeep = 9;
 			while (true) {
 				System.err.println();
-				t.setIsTerminating(false);
-				Search R1 = new Search( "Thread-1", board, side, t, nextMove);
-				s = recvMsg(R1, t);
+				s = recvMsg();
 				System.err.print("Received: " + s);
 				try {
 					MsgType mt = Protocol.getMessageType(s);
@@ -98,15 +81,9 @@ public class Main {
 							Kalah.secondMove = false;
 
 
-							Search R2 = new Search( "Thread-1", board, side, t, nextMove);
-							R2.search(board, side, new ValueObj(), t);
-							// t.setIsTerminating(false);
-							// R2.start();
-
-							// TimeUnit.SECONDS.sleep(3);
-
-							// t.setIsTerminating(true);
-							// R2.join();
+							Search R2 = new Search( board, side, nextMove);
+							R2.search(board, side, new ValueObj());
+							
 							sendMsg(Protocol.createMoveMsg(R2.getBestMove().getMove()));
 							System.err.println("MOVE;" + R2.getBestMove().getMove());
 						} else {
@@ -127,16 +104,9 @@ public class Main {
 							side = side.opposite();
 							System.err.println("Swapping sides");
 						} else if (!r.end && r.again) {
-							Search R2 = new Search("Thread-2", board, side, t, nextMove);
-							// t.setIsTerminating(false);
-							// R2.start();
+							Search R2 = new Search(board, side, nextMove);
 
-							// TimeUnit.SECONDS.sleep(1);
-
-							// t.setIsTerminating(true);
-							// R2.join();
-
-							R2.search(board, side, new ValueObj(), t);
+							R2.search(board, side, new ValueObj());
 
 							sendMsg(Protocol.createMoveMsg(R2.getBestMove().getMove()));
 							System.err.println("MOVE;" + Protocol.createMoveMsg(R2.getBestMove().getMove()));
@@ -148,8 +118,6 @@ public class Main {
 						System.err.println("Is the game over? " + r.end);
 						if (!r.end)
 							System.err.println("Is it our turn again? " + r.again);
-						// System.err.print("The board:\n" + b);
-						// }while(r.again && !r.end);
 						break;
 					case END:
 						System.err.println("An end. Bye bye!");

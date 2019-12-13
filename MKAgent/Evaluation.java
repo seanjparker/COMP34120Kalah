@@ -35,34 +35,16 @@ public class Evaluation {
   public static int evaluate(final Board board, final Side side) {
 	  	  int detail = 50;
 		  double v1 = (scorePitDifference(board, side))*51;
-		  // System.err.println(side);
-		  // System.err.print(board);
-		  // System.err.println(v1);
 		  double v2 = ((seedDifference(board, side)+20)/(20.0*2)) *detail;
-		  // System.err.println(v2);
 		  double v3 = (extraMove(board, side)/7.0) * detail;
 		  double v4 = (1 - (extraMove(board, side.opposite())/7.0)) * detail;
-		  // System.err.println(v3);
-		  // System.err.println(v4);
 		  double v5 = ((clusterToScorePit(board, side)+50)/(50.0*2) ) *detail;
-		  // System.err.println(v4);
 		  double v6 = (1.0-((clusterToScorePit(board, side.opposite())+50)/(50.0*2))) *detail ;
-		  // Syste.err.println(v5);
 		  double v7 = (haveHalfStoneTotal(board, side)/1.0) * detail;
-		  // System.err.println(v6);
 		  double v8 = (1.0-haveHalfStoneTotal(board, side.opposite())) * detail;
-		  // System.err.println(v7);
 		  double v9 = (1-(captureStones(board, side.opposite())/20.0)) * detail;
-		  // System.err.println();
-		  // System.err.println(captureStones(board, side));
-		  // System.err.println(captureStones(board, side.opposite()));
 		  double v10 = (captureStones(board, side)/20.0) * detail;
-		  // System.err.println(v9);
-		  // System.err.println(v10);
-
-		  // System.err.printf("pit diff = %d, seed diff = %d, extra move = %d, cluster = %d, -cluster = %d, half total = %d, -halftotal = %d, cap = %d, -cap = %d\n\n", v1, v2, v3, v4, v5, v6, v7, v8, v9);
-
-		  // System.err.println(v1*0.4 +((v2+v3+v4+v5+v6+v7)/6)*0.6);
+		  
 		  int result = (int) Math.round(v1
 							  + (
 								  v2 * 0.2 +
@@ -84,20 +66,6 @@ public class Evaluation {
 							  )*0.51
 						  );
 		  return result;
-
-		// int v1 = scorePitDifference(board, side) * 5;
-		// int v2 = seedDifference(board, side) / 1;
-		// int v3 = extraMove(board, side) * 2;
-		// int v4 = clusterToScorePit(board, side) / 1;
-		// int v5 = -clusterToScorePit(board, side.opposite()) / 2;
-		// int v6 = haveHalfStoneTotal(board, side) * 10000;
-		// int v7 = -haveHalfStoneTotal(board, side.opposite()) * 10000;
-		// int v8 = -captureStones(board, side) * 5;
-		// int v9 = captureStones(board, side.opposite()) / 1;
-
-		// // System.err.printf("pit diff = %d, seed diff = %d, extra move = %d, cluster = %d, -cluster = %d, half total = %d, -halftotal = %d, cap = %d, -cap = %d\n\n", v1, v2, v3, v4, v5, v6, v7, v8, v9);
-
-		// return v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9;
 	}
 
 	public static int quickEval(final Board board, final Side side) {
@@ -142,7 +110,7 @@ public class Evaluation {
 	}
 
 	// Heuristic 4
-	// min =
+	// min = -98 max 98
 	private static int clusterToScorePit(final Board board, final Side side) {
 		int value = 0;
 		for (int i = 1; i <= board.getNoOfHoles(); i++) {
@@ -170,9 +138,6 @@ public class Evaluation {
 
 			// Finds the wholes where the opponent has 0 seeds and we have >0 that are vunerable to capture
 			if (board.getSeeds(side, i) == 0 && board.getSeeds(side.opposite(), 8-i) != 0) {
-				// System.err.println("Hole: " + i);
-				// System.err.println("Us: " + board.getSeeds(side, i));
-				// System.err.println("Them: " + board.getSeeds(side.opposite(), 8-i));
 				capturableStones.add(i);
 			}
 		}
