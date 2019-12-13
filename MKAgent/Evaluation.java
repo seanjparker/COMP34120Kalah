@@ -33,8 +33,8 @@ public class Evaluation {
 	* Check for vunerable stones
 	*/
   public static int evaluate(final Board board, final Side side) {
-	  	  int detail = 50;
-		  double v1 = (scorePitDifference(board, side))*51;
+	  	  int detail = 100;
+		  double v1 = (scorePitDifference(board, side))*101;
 		  // System.err.println(side);
 		  // System.err.print(board);
 		  // System.err.println(v1);

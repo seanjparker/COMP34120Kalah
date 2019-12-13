@@ -63,6 +63,6 @@ public class ValueObj implements Comparable<Object> {
   }
 
   public String toString() {
-    return "Value = " + value + ", move = " + move + ", depth = " + depth;
+    return "Value = " + value + ", move = " + move + ", depth = " + depth + ", type = " + type;
   }
 }
