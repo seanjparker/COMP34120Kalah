@@ -2,6 +2,6 @@ How to execute the agent
 
 It uses the same protocol as in the instructions in Blackboard:
 
-java -jar ManKalah.jar "java -jar <Name of the file>.jar" "java -jar <Name of the file>.jar"
+To run our agent you need to run: java -jar Group2Agent.jar
 
-Where our agent can be in either of the <Name of the file> placeholders.
+If you have anyquestion please email us: sara.caballero-bruno@student.manchester.ac.uk

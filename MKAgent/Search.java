@@ -22,7 +22,7 @@ class Search {
 
 	public void search(Board board, Side side, ValueObj vt) {
 		if(board.getSeedsInStore(Side.SOUTH)<50 ||board.getSeedsInStore(Side.NORTH)<50 ){
-			this.valueObject = alphaBetaTT(board, side, 8, -1000000, 1000000, false,false);
+			this.valueObject = alphaBetaTT(board, side, 10, -1000000, 1000000, false,false);
 		}
 		else{
 			this.valueObject = alphaBetaTT(board, side, 1, -1000000, 1000000, false,true);

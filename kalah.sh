@@ -11,7 +11,7 @@ compile()
     mkdir bin
   fi
   javac MKAgent/Main.java -d bin
-  jar cfm Agent.jar META-INF/MANIFEST.MF -C bin .
+  jar cfm Group2Agent.jar META-INF/MANIFEST.MF -C bin .
 }
 
 run()
