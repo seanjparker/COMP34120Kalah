@@ -37,7 +37,7 @@ public class Main {
 	 * @return The message.
 	 * @throws IOException if there has been an I/O error.
 	 */
-	public static String recvMsg() throws IOException {
+	public static String recvMsg(Board board, Side side) throws IOException {
 		StringBuilder message = new StringBuilder();
 		int newCharacter;
 		
@@ -48,6 +48,7 @@ public class Main {
 			message.append((char) newCharacter);
 		} while ((char) newCharacter != '\n');
 
+		t.setIsTerminating(true);
 		return message.toString();
 	}
 
@@ -66,7 +67,7 @@ public class Main {
 			ValueObj nextMove = new ValueObj();
 			while (true) {
 				System.err.println();
-				s = recvMsg();
+				s = recvMsg(board, side);
 				System.err.print("Received: " + s);
 				try {
 					MsgType mt = Protocol.getMessageType(s);
